@@ -6692,6 +6692,13 @@ public final class Settings {
         public static final String WEB_ACTION_ENABLED = "web_action_enabled";
 
         /**
+         * Add or remove software navigation bar
+         *
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_VISIBLE = "navigation_bar_visible";
+
+        /**
          * Whether to include options in power menu for rebooting into recovery or bootloader
          * @hide
          */
