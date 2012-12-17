@@ -28,6 +28,7 @@ import android.app.PendingIntent;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -92,6 +93,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.logging.MetricsLogger;
@@ -270,6 +272,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     KeyguardMonitor mKeyguardMonitor;
     BrightnessMirrorController mBrightnessMirrorController;
     AccessibilityController mAccessibilityController;
+    LinearLayout mCenterClockLayout;
 
     int mNaturalBarHeight = -1;
 
@@ -717,6 +720,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // figure out which pixel-format to use for the status bar.
         mPixelFormat = PixelFormat.OPAQUE;
 
+        mCenterClockLayout = (LinearLayout)mStatusBarView.findViewById(R.id.center_clock_layout);
         mStackScroller = (NotificationStackScrollLayout) mStatusBarWindow.findViewById(
                 R.id.notification_stack_scroller);
         mStackScroller.setLongPressListener(getNotificationLongClicker());
@@ -1758,6 +1762,25 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                             .start();
                 }
             }
+        }
+    }
+
+    public void showClock(boolean show) {
+        if (mStatusBarView == null) return;
+        ContentResolver resolver = mContext.getContentResolver();
+        View clock = mStatusBarView.findViewById(R.id.clock);
+        View cclock = mStatusBarView.findViewById(R.id.center_clock);
+        boolean showClock = (Settings.System.getIntForUser(
+                resolver, Settings.System.STATUS_BAR_CLOCK, 1,
+                UserHandle.USER_CURRENT) == 1);
+        int clockLocation = Settings.System.getIntForUser(
+            resolver, Settings.System.STATUSBAR_CLOCK_STYLE, 0,
+            UserHandle.USER_CURRENT);
+        if (clockLocation == 0 && clock != null) {
+            clock.setVisibility(show ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
+        }
+        if (clockLocation == 1 && cclock != null) {
+            cclock.setVisibility(show ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
         }
     }
 
