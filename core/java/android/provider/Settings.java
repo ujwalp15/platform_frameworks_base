@@ -4364,6 +4364,13 @@ public final class Settings {
          */
         public static final String STATUSBAR_6BAR_SIGNAL = "statusbar_6bar_signal";
 
+        /*
+         * Wether to allow full screen swipe detection on notification drawer
+         * for swipe to switch or not
+         * @hide
+         */
+        public static final String SWIPE_TO_SWITCH_SCREEN_DETECTION = "full_swipe_to_switch_detection";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
