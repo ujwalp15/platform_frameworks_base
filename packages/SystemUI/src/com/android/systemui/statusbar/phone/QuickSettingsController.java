@@ -54,6 +54,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_WIMAX;
 import static com.android.internal.util.cm.QSConstants.TILE_QUICKRECORD;
 import static com.android.internal.util.cm.QSConstants.TILE_THEME;
 import static com.android.internal.util.cm.QSConstants.TILE_SHAKE;
+import static com.android.internal.util.oct.QSConstants.TILE_TENTACLES;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -107,6 +108,7 @@ import com.android.systemui.quicksettings.ScreenTimeoutTile;
 import com.android.systemui.quicksettings.SleepScreenTile;
 import com.android.systemui.quicksettings.ShakeEventTile;
 import com.android.systemui.quicksettings.SyncTile;
+import com.android.systemui.quicksettings.TentaclesTile;
 import com.android.systemui.quicksettings.ToggleLockscreenTile;
 import com.android.systemui.quicksettings.TorchTile;
 import com.android.systemui.quicksettings.UsbTetherTile;
@@ -277,6 +279,9 @@ public class QuickSettingsController {
                 } else {
                     qs = new AirplaneModeTile(mContext, this, mStatusBarService.mNetworkController);
                 }
+                qs = new AirplaneModeTile(mContext, this, mStatusBarService.mNetworkController);
+            } else if (tile.equals(TILE_TENTACLES)) {
+                qs = new TentaclesTile(mContext, this);
             } else if (tile.equals(TILE_TORCH)) {
                 qs = new TorchTile(mContext, this, mHandler);
             } else if (tile.equals(TILE_SLEEP)) {
