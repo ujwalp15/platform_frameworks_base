@@ -178,8 +178,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import libcore.io.ErrnoException;
 import libcore.io.IoUtils;
@@ -5449,7 +5447,7 @@ public class PackageManagerService extends IPackageManager.Stub {
 
             //Icon Packs need aapt too
             //TODO: No need to run aapt on icons for every startup...
-            if (isIconCompileNeeded(pkg)) {
+            if (pkg.hasIconPack) {
                 try {
                     ThemeUtils.createCacheDirIfNotExists();
                     ThemeUtils.createIconDirIfNotExists(pkg.packageName);
@@ -5465,30 +5463,6 @@ public class PackageManagerService extends IPackageManager.Stub {
         return pkg;
     }
 
-
-    private boolean isIconCompileNeeded(Package pkg) {
-        if (!pkg.hasIconPack) return false;
-        // Read in the stored hash value and compare to the pkgs computed hash value
-        FileInputStream in = null;
-        DataInputStream dataInput = null;
-        try {
-            String hashFile = ThemeUtils.getIconHashFile(pkg.packageName);
-            in = new FileInputStream(hashFile);
-            dataInput = new DataInputStream(in);
-            int storedHashCode = dataInput.readInt();
-            int actualHashCode = getPackageHashCode(pkg);
-            return storedHashCode != actualHashCode;
-        } catch(IOException e) {
-            // all is good enough for government work here,
-            // we'll just return true and the icons will be processed
-        } finally {
-            IoUtils.closeQuietly(in);
-            IoUtils.closeQuietly(dataInput);
-        }
-
-        return true;
-    }
-
     private void compileResourcesAndIdmapIfNeeded(PackageParser.Package targetPkg,
                                                PackageParser.Package themePkg)
             throws IdmapException, AaptException, IOException, Exception
@@ -5502,16 +5476,7 @@ public class PackageManagerService extends IPackageManager.Stub {
             return;
         }
 
-
-        // Always use the manifest's pkgName when compiling resources
-        // the member value of "packageName" is dependent on whether this was a clean install
-        // or an upgrade w/  If the app is an upgrade then the original package name is used.
-        // because libandroidfw uses the manifests's pkgName during idmap creation we must
-        // be consistent here and use the same name, otherwise idmap will look in the wrong place
-        // for the resource table.
-        String pkgName = targetPkg.mRealPackage != null ?
-                targetPkg.mRealPackage : targetPkg.packageName;
-        compileResourcesIfNeeded(pkgName, themePkg);
+        compileResourcesIfNeeded(targetPkg.packageName, themePkg);
         generateIdmap(targetPkg.packageName, themePkg);
     }
 
