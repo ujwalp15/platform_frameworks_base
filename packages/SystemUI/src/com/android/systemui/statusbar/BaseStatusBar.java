@@ -423,7 +423,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         mStatusBarContainer = new FrameLayout(mContext);
         mPeek = new Peek(this, mContext);
         mNotificationHelper = new NotificationHelper(this, mContext);
- 
+
         mPeek.setNotificationHelper(mNotificationHelper);
 
         // Connect in to the status bar manager service
@@ -653,9 +653,9 @@ public abstract class BaseStatusBar extends SystemUI implements
                 null, UserHandle.CURRENT);
     }
 
-    private void launchFloating(PendingIntent pIntent) {
+    private void launchFloating(PendingIntent pIntent, boolean allowed) {
         Intent overlay = new Intent();
-        overlay.addFlags(Intent.FLAG_FLOATING_WINDOW | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        if (allowed) overlay.addFlags(Intent.FLAG_FLOATING_WINDOW | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         try {
             ActivityManagerNative.getDefault().resumeAppSwitches();
             ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
@@ -754,7 +754,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                                     animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_NONE);
                                     Toast.makeText(mContext, text, duration).show();
                                 } else {
-                                    launchFloating(contentIntent);
+                                    launchFloating(contentIntent, true);
                                     animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_NONE);
                                 }
                             } else {
@@ -1259,7 +1259,11 @@ public abstract class BaseStatusBar extends SystemUI implements
                 // System is dead
             }
 
-            if (mPendingIntent != null) {
+            if (mPile.launchNextNotificationFloating()) {
+                if (mPendingIntent != null) {
+                    launchFloating(mPendingIntent, allowed);
+                }
+            } else if (mPendingIntent != null) {
                 int[] pos = new int[2];
                 v.getLocationOnScreen(pos);
                 Intent overlay = new Intent();
@@ -1414,7 +1418,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         updateExpansionStates();
         updateNotificationIcons();
         mHandler.removeCallbacks(mPanelCollapseRunnable);
-       
+
         if (!mPowerManager.isScreenOn()) {
             // screen off - check if peek is enabled
             if (mNotificationHelper.isPeekEnabled()) {
