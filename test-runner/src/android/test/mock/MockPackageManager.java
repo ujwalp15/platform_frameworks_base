@@ -689,6 +689,14 @@ public class MockPackageManager extends PackageManager {
     }
 
     @Override
+    public int processThemeResources(String themePkgName) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @hide
+     */
+    @Override
     public void setComponentProtectedSetting(ComponentName componentName, boolean newState) {
         throw new UnsupportedOperationException();
     }
