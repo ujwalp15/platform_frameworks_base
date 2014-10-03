@@ -54,7 +54,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_WIMAX;
 import static com.android.internal.util.cm.QSConstants.TILE_QUICKRECORD;
 import static com.android.internal.util.cm.QSConstants.TILE_THEME;
 import static com.android.internal.util.cm.QSConstants.TILE_SHAKE;
-import static com.android.internal.util.oct.QSConstants.TILE_TENTACLES;
+import static com.android.internal.util.cm.QSConstants.TILE_TENTACLES;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
