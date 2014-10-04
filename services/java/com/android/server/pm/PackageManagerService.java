@@ -128,6 +128,7 @@ import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.Environment.UserEnvironment;
 import android.os.UserManager;
+import android.provider.Settings.Global;
 import android.provider.Settings.Secure;
 import android.security.KeyStore;
 import android.security.SystemKeyStore;
@@ -181,6 +182,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import libcore.io.ErrnoException;
 import libcore.io.IoUtils;
@@ -5490,6 +5493,29 @@ public class PackageManagerService extends IPackageManager.Stub {
 
         return pkg;
     }
+    
+    private boolean isIconCompileNeeded(Package pkg) {
+        if (!pkg.hasIconPack) return false;
+        // Read in the stored hash value and compare to the pkgs computed hash value
+        FileInputStream in = null;
+        DataInputStream dataInput = null;
+        try {
+            String hashFile = ThemeUtils.getIconHashFile(pkg.packageName);
+            in = new FileInputStream(hashFile);
+            dataInput = new DataInputStream(in);
+            int storedHashCode = dataInput.readInt();
+            int actualHashCode = getPackageHashCode(pkg);
+            return storedHashCode != actualHashCode;
+        } catch(IOException e) {
+            // all is good enough for government work here,
+            // we'll just return true and the icons will be processed
+        } finally {
+            IoUtils.closeQuietly(in);
+            IoUtils.closeQuietly(dataInput);
+        }
+
+        return true;
+    }
 
     private void compileResourcesAndIdmapIfNeeded(PackageParser.Package targetPkg,
                                                PackageParser.Package themePkg)
@@ -5504,7 +5530,15 @@ public class PackageManagerService extends IPackageManager.Stub {
             return;
         }
 
-        compileResourcesIfNeeded(targetPkg.packageName, themePkg);
+        // Always use the manifest's pkgName when compiling resources
+        // the member value of "packageName" is dependent on whether this was a clean install
+        // or an upgrade w/  If the app is an upgrade then the original package name is used.
+        // because libandroidfw uses the manifests's pkgName during idmap creation we must
+        // be consistent here and use the same name, otherwise idmap will look in the wrong place
+        // for the resource table.
+        String pkgName = targetPkg.mRealPackage != null ?
+                targetPkg.mRealPackage : targetPkg.packageName;
+        compileResourcesIfNeeded(pkgName, themePkg);
         generateIdmap(targetPkg.packageName, themePkg);
     }
 
@@ -6454,6 +6488,7 @@ public class PackageManagerService extends IPackageManager.Stub {
         return allowed;
     }
 
+
     final class ActivityIntentResolver
             extends IntentResolver<PackageParser.ActivityIntentInfo, ResolveInfo> {
         public List<ResolveInfo> queryIntent(Intent intent, String resolvedType,
@@ -6467,8 +6502,20 @@ public class PackageManagerService extends IPackageManager.Stub {
                 int userId) {
             if (!sUserManager.exists(userId)) return null;
             mFlags = flags;
-            return super.queryIntent(intent, resolvedType,
+            List<ResolveInfo> list = super.queryIntent(intent, resolvedType,
                     (flags & PackageManager.MATCH_DEFAULT_ONLY) != 0, userId);
+
+            // Remove protected Application components
+            if (Binder.getCallingUid() != Process.SYSTEM_UID) {
+                Iterator<ResolveInfo> itr = list.iterator();
+                while (itr.hasNext()) {
+                    if (itr.next().activityInfo.applicationInfo.protect) {
+                        itr.remove();
+                    }
+                }
+            }
+
+            return list;
         }
 
         public List<ResolveInfo> queryIntentForPackage(Intent intent, String resolvedType,
@@ -12559,6 +12606,7 @@ public class PackageManagerService extends IPackageManager.Stub {
     @Override
     public ComposedIconInfo getComposedIconInfo() {
         return mIconPackHelper != null ? mIconPackHelper.getComposedIconInfo() : null;
+    }
 
     @Override
     public int processThemeResources(String themePkgName) {
