@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- * This code has been modified. Portions copyright (C) 2013, ParanoidAndroid Project.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,6 @@ import android.provider.Settings;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemProperties;
 import android.text.method.AllCapsTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.util.DisplayMetrics;
@@ -41,13 +40,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class CarbonLogoActivity extends Activity {
+public class OctLogoActivity extends Activity {
     FrameLayout mContent;
     int mCount;
     final Handler mHandler = new Handler();
-    final static int SOLID_BGCOLOR = 0xFF1F1F1F;
-    final static int CLEAR_BGCOLOR = 0xC0000000;
-    final static int TEXT_COLOR = 0xFFFFFFFF;
+    static final int BGCOLOR = 0xffed1d24;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,59 +54,52 @@ public class CarbonLogoActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         Typeface bold = Typeface.create("sans-serif", Typeface.BOLD);
-        Typeface condensed = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
         Typeface light = Typeface.create("sans-serif-light", Typeface.NORMAL);
 
         mContent = new FrameLayout(this);
-        mContent.setBackgroundColor(CLEAR_BGCOLOR);
-
+        mContent.setBackgroundColor(0xC0000000);
+        
         final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.CENTER;
 
-        final ImageView bglogo = new ImageView(this);
-        bglogo.setImageResource(com.android.internal.R.drawable.carbon_bg_logo);
-        bglogo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        bglogo.setVisibility(View.INVISIBLE);
-
         final ImageView logo = new ImageView(this);
-        logo.setImageResource(com.android.internal.R.drawable.carbon_logo);
+        logo.setImageResource(com.android.internal.R.drawable.oct_logo);
         logo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         logo.setVisibility(View.INVISIBLE);
 
         final View bg = new View(this);
-        bg.setBackgroundColor(SOLID_BGCOLOR);
+        bg.setBackgroundColor(BGCOLOR);
         bg.setAlpha(0f);
 
         final TextView letter = new TextView(this);
 
         letter.setTypeface(bold);
         letter.setTextSize(300);
-        letter.setTextColor(TEXT_COLOR);
+        letter.setTextColor(0xFFFFFFFF);
         letter.setGravity(Gravity.CENTER);
-        letter.setText("C");
+        letter.setText("O");
 
         final int p = (int)(4 * metrics.density);
 
         final TextView tv = new TextView(this);
-        if (condensed != null) tv.setTypeface(condensed);
-        tv.setTextSize(20);
+        if (light != null) tv.setTypeface(light);
+        tv.setTextSize(30);
         tv.setPadding(p, p, p, p);
-        tv.setTextColor(TEXT_COLOR);
+        tv.setTextColor(0xFFFFFFFF);
         tv.setGravity(Gravity.CENTER);
         tv.setTransformationMethod(new AllCapsTransformationMethod(this));
-        tv.setText("Elegant - CarbonROM - Smooth");
+        tv.setText("OctOS supporting opensource");
         tv.setVisibility(View.INVISIBLE);
 
         mContent.addView(bg);
         mContent.addView(letter, lp);
-        mContent.addView(bglogo, lp);
         mContent.addView(logo, lp);
 
         final FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(lp);
         lp2.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        lp2.bottomMargin = p;
+        lp2.bottomMargin = 10*p;
 
         mContent.addView(tv, lp2);
 
@@ -142,24 +132,17 @@ public class CarbonLogoActivity extends Activity {
                             .setInterpolator(new AccelerateInterpolator())
                             .setDuration(1000)
                             .start();
-                    bglogo.setAlpha(0f);
-                    bglogo.setVisibility(View.VISIBLE);
-                    bglogo.setScaleX(0.5f);
-                    bglogo.setScaleY(0.5f);
-                    bglogo.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                        .setDuration(600).setStartDelay(500)
-                        .start();
                     logo.setAlpha(0f);
                     logo.setVisibility(View.VISIBLE);
                     logo.setScaleX(0.5f);
                     logo.setScaleY(0.5f);
                     logo.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                        .setDuration(1000).setStartDelay(800)
+                        .setDuration(1000).setStartDelay(500)
                         .setInterpolator(new AnticipateOvershootInterpolator())
                         .start();
                     tv.setAlpha(0f);
                     tv.setVisibility(View.VISIBLE);
-                    tv.animate().alpha(1f).setDuration(1000).setStartDelay(1100).start();
+                    tv.animate().alpha(1f).setDuration(1000).setStartDelay(1000).start();
                     return true;
                 }
                 return false;
@@ -176,14 +159,13 @@ public class CarbonLogoActivity extends Activity {
                             | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                         .addCategory("com.android.internal.category.PLATLOGO"));
                 } catch (ActivityNotFoundException ex) {
-                    android.util.Log.e("CarbonLogoActivity", "Couldn't catch a break.");
+                    android.util.Log.e("OctLogoActivity", "Couldn't catch a break.");
                 }
                 finish();
                 return true;
             }
         });
-
+        
         setContentView(mContent);
     }
 }
-

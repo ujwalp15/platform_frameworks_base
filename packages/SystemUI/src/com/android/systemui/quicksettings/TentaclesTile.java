@@ -10,9 +10,9 @@ import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
-public class CarbonTile extends QuickSettingsTile{
+public class TentaclesTile extends QuickSettingsTile{
 
-    public CarbonTile(Context context, final QuickSettingsController qsc) {
+    public TentaclesTile(Context context, final QuickSettingsController qsc) {
         super(context, qsc);
 
         mOnClick = new View.OnClickListener() {
@@ -22,7 +22,7 @@ public class CarbonTile extends QuickSettingsTile{
                 qsc.mBar.collapseAllPanels(true);
                 Intent intent = new Intent("android.intent.action.MAIN");
                 intent.setComponent(ComponentName
-                        .unflattenFromString("com.android.settings/com.carbon.fibers.SettingsActivity"));
+                        .unflattenFromString("com.oct.tentacles/.SettingsActivity"));
                 intent.addCategory("android.intent.category.LAUNCHER");
                 startSettingsActivity(intent);
             }
@@ -42,7 +42,7 @@ public class CarbonTile extends QuickSettingsTile{
     }
 
     private synchronized void updateTile() {
-        mDrawable = R.drawable.ic_qs_carbon;
-        mLabel = mContext.getString(R.string.quick_settings_carbon_label);
+        mDrawable = R.drawable.ic_qs_tentacles;
+        mLabel = mContext.getString(R.string.quick_settings_tentacles_label);
     }
 }

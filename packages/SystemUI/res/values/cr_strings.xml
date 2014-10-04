@@ -114,7 +114,6 @@
     <string name="quick_settings_music_schedule_cancel">Clear timer</string>
     <string name="quick_settings_music_schedule_update">Update timer</string>
     <string name="quick_settings_camera_label">Camera</string>
-    <string name="quick_settings_carbon_label">Carbon Settings</string>
     <string name="quick_settings_powermenu_label">Power Menu</string>
     <string name="quick_settings_network_adb_disabled_label">Disabled</string>
     <string name="quick_settings_network_adb_enabled_label">Enabled</string>
@@ -280,4 +279,7 @@
 
     <!-- Spam filter -->
     <string name="status_bar_notification_spam_item_title">Ignore messages like this</string>
+    
+   <!-- Tentacles tile -->
+    <string name="quick_settings_tentacles_label">Tentacles Settings</string>
 </resources>

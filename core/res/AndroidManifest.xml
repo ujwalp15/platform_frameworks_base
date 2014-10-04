@@ -2695,7 +2695,7 @@
                 android:excludeFromRecents="true"
                 android:process=":ui">
         </activity>
-        <activity android:name="com.android.internal.app.CarbonLogoActivity"
+        <activity android:name="com.android.internal.app.OctLogoActivity"
                 android:theme="@style/Theme.Wallpaper.NoTitleBar.Fullscreen"
                 android:process=":ui">
         </activity>
