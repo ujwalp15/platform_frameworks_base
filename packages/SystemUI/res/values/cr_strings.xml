@@ -281,5 +281,5 @@
     <string name="status_bar_notification_spam_item_title">Ignore messages like this</string>
     
    <!-- Tentacles tile -->
-    <string name="quick_settings_tentacles_label">Tentacles Settings</string>
+    <string name="quick_settings_tentacles_label">Tentacles</string>
 </resources>
