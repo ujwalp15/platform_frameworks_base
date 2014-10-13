@@ -195,6 +195,6 @@
     <string name="def_theme_components"></string>
 
     <!-- Default value of Settings.System.DOUBLE_TAP_SLEEP_GESTURE -->
-    <integer name="def_double_tap_sleep_gesture">1</integer>
+    <integer name="def_double_tap_sleep_gesture">0</integer>
 
 </resources>
