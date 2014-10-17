@@ -279,7 +279,6 @@ public class QuickSettingsController {
                 } else {
                     qs = new AirplaneModeTile(mContext, this, mStatusBarService.mNetworkController);
                 }
-                qs = new AirplaneModeTile(mContext, this, mStatusBarService.mNetworkController);
             } else if (tile.equals(TILE_TENTACLES)) {
                 qs = new TentaclesTile(mContext, this);
             } else if (tile.equals(TILE_TORCH)) {

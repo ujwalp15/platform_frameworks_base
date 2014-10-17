@@ -128,7 +128,6 @@ import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.Environment.UserEnvironment;
 import android.os.UserManager;
-import android.provider.Settings.Global;
 import android.provider.Settings.Secure;
 import android.security.KeyStore;
 import android.security.SystemKeyStore;
@@ -5499,7 +5498,8 @@ public class PackageManagerService extends IPackageManager.Stub {
 
         return pkg;
     }
-    
+
+
     private boolean isIconCompileNeeded(Package pkg) {
         if (!pkg.hasIconPack) return false;
         // Read in the stored hash value and compare to the pkgs computed hash value
@@ -5535,6 +5535,7 @@ public class PackageManagerService extends IPackageManager.Stub {
             generateIdmapForLegacyTheme(targetPkg.packageName, themePkg);
             return;
         }
+
 
         // Always use the manifest's pkgName when compiling resources
         // the member value of "packageName" is dependent on whether this was a clean install
@@ -6494,7 +6495,6 @@ public class PackageManagerService extends IPackageManager.Stub {
         return allowed;
     }
 
-
     final class ActivityIntentResolver
             extends IntentResolver<PackageParser.ActivityIntentInfo, ResolveInfo> {
         public List<ResolveInfo> queryIntent(Intent intent, String resolvedType,
@@ -6508,20 +6508,8 @@ public class PackageManagerService extends IPackageManager.Stub {
                 int userId) {
             if (!sUserManager.exists(userId)) return null;
             mFlags = flags;
-            List<ResolveInfo> list = super.queryIntent(intent, resolvedType,
+            return super.queryIntent(intent, resolvedType,
                     (flags & PackageManager.MATCH_DEFAULT_ONLY) != 0, userId);
-
-            // Remove protected Application components
-            if (Binder.getCallingUid() != Process.SYSTEM_UID) {
-                Iterator<ResolveInfo> itr = list.iterator();
-                while (itr.hasNext()) {
-                    if (itr.next().activityInfo.applicationInfo.protect) {
-                        itr.remove();
-                    }
-                }
-            }
-
-            return list;
         }
 
         public List<ResolveInfo> queryIntentForPackage(Intent intent, String resolvedType,
@@ -10472,7 +10460,7 @@ public class PackageManagerService extends IPackageManager.Stub {
                         true,  //notLaunched
                         false, //heads up
                         false, //blocked
-                        null, null, null, null, null);
+                        null, null, null);
                 if (!isSystemApp(ps)) {
                     if (ps.isAnyInstalled(sUserManager.getUserIds())) {
                         // Other user still have this package installed, so all
@@ -12664,68 +12652,5 @@ public class PackageManagerService extends IPackageManager.Stub {
         }
 
         return 0;
-    }
-
-    @Override
-    public void setComponentProtectedSetting(ComponentName componentName, boolean newState,
-            int userId) {
-        enforceCrossUserPermission(Binder.getCallingUid(), userId, false, "set protected");
-
-        String packageName = componentName.getPackageName();
-        String className = componentName.getClassName();
-
-        PackageSetting pkgSetting;
-        ArrayList<String> components;
-
-        synchronized (mPackages) {
-            pkgSetting = mSettings.mPackages.get(packageName);
-
-            if (pkgSetting == null) {
-                if (className == null) {
-                    throw new IllegalArgumentException(
-                            "Unknown package: " + packageName);
-                }
-                throw new IllegalArgumentException(
-                        "Unknown component: " + packageName
-                                + "/" + className);
-            }
-
-            //Protection levels must be applied at the Component Level!
-            if (className == null) {
-                throw new IllegalArgumentException(
-                        "Must specify Component Class name."
-                );
-            } else {
-                PackageParser.Package pkg = pkgSetting.pkg;
-                if (pkg == null || !pkg.hasComponentClassName(className)) {
-                    if (pkg.applicationInfo.targetSdkVersion >= Build.VERSION_CODES.JELLY_BEAN) {
-                        throw new IllegalArgumentException("Component class " + className
-                                + " does not exist in " + packageName);
-                    } else {
-                        Slog.w(TAG, "Failed setComponentProtectedSetting: component class "
-                                + className + " does not exist in " + packageName);
-                    }
-                }
-
-                pkgSetting.protectComponentLPw(className, newState, userId);
-                mSettings.writePackageRestrictionsLPr(userId);
-
-                components = mPendingBroadcasts.get(userId, packageName);
-                final boolean newPackage = components == null;
-                if (newPackage) {
-                    components = new ArrayList<String>();
-                }
-                if (!components.contains(className)) {
-                    components.add(className);
-                }
-            }
-        }
-
-        long callingId = Binder.clearCallingIdentity();
-        try {
-            int packageUid = UserHandle.getUid(userId, pkgSetting.appId);
-        } finally {
-            Binder.restoreCallingIdentity(callingId);
-        }
     }
 }

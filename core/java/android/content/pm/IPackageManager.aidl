@@ -431,7 +431,4 @@ interface IPackageManager {
     ComposedIconInfo getComposedIconInfo();
     int processThemeResources(String themePkgName);
 
-    /** Protected Apps */
-    void setComponentProtectedSetting(in ComponentName componentName, in boolean newState,
-            int userId);
 }
