@@ -4546,13 +4546,6 @@ public final class Settings {
         public static final String HEADS_UP_TEXT_COLOR = "heads_up_text_color";
 
         /**
-         * Heads Up in Floating Window
-         *
-         * @hide
-         */
-        public static final String HEADS_UP_FLOATING_WINDOW = "heads_up_floating_window";
-
-        /**
          * Whether lockscreen rotation is enabled
          * 0 = off, 1 = on, 2 = portrait, 3 = landscape
          * @hide
