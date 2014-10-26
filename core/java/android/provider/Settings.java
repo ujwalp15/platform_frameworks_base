@@ -3149,12 +3149,6 @@ public final class Settings {
          */
         public static final String SHOW_LTE_OR_FOURGEE = "show_lte_or_fourgee";
 
-    	/**
-    	* Configurable Data on wifi - up to per user defined
-    	* @hide
-    	*/
-    	public static final String HIDE_DATA_ON_WIFI = "hide_data_on_wifi";
-
         /**
         * Notification Power Widget - Custom Brightness Mode
         * @hide
@@ -9553,5 +9547,4 @@ public final class Settings {
     public static String getGTalkDeviceId(long androidId) {
         return "android-" + Long.toHexString(androidId);
     }
-
 }

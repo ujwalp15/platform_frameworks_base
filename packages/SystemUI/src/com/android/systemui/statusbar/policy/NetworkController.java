@@ -97,7 +97,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
     boolean mShowPhoneRSSIForData = false;
     boolean mShowAtLeastThreeGees = false;
     boolean mAlwaysShowCdmaRssi = false;
-    boolean mHideDataOnWifi = false;
 
     String mContentDescriptionPhoneSignal;
     String mContentDescriptionWifi;
@@ -229,7 +228,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
         mShowAtLeastThreeGees = res.getBoolean(R.bool.config_showMin3G);
         mAlwaysShowCdmaRssi = res.getBoolean(
                 com.android.internal.R.bool.config_alwaysUseCdmaRssi);
-        mHideDataOnWifi = res.getBoolean(R.bool.config_hideDataOnWifi);
 
         // set up the default wifi icon, used when no radios have ever appeared
         updateWifiIcons();
@@ -374,10 +372,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
     public void removeNetworkSignalChangedCallback(NetworkSignalChangedCallback cb) {
         mSignalsChangedCallbacks.remove(cb);
     }
-    
-    public boolean hideDataOnWifi() {
-        return mHideDataOnWifi;
-    }
 
     public void addSignalStrengthChangedCallback(SignalStrengthChangedCallback cb) {
         mSignalStrengthChangedCallbacks.add(cb);
@@ -414,18 +408,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
                     mContentDescriptionDataType,
                     mNoSimIconId);
         } else {
-          boolean defValue = mContext.getResources().getBoolean(R.bool.config_hideDataOnWifi);
-          boolean hideDataOnWifi = Settings.System.getBoolean(mContext.getContentResolver(),
-                      Settings.System.HIDE_DATA_ON_WIFI, defValue);
-            if ( mWifiEnabled && mWifiConnected && hideDataOnWifi) {
-            // hide mobile data
-            cluster.setMobileDataIndicators(
-                    false,
-                    mShowPhoneRSSIForData ? mPhoneSignalIconId : mDataSignalIconId,
-                    mDataTypeIconId,
-                    mContentDescriptionPhoneSignal,
-                    mContentDescriptionDataType);
-            } else {
             // normal mobile data
             cluster.setMobileDataIndicators(
                     mHasMobileDataFeature,
@@ -435,7 +417,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
                     mContentDescriptionPhoneSignal,
                     mContentDescriptionDataType,
                     mNoSimIconId);
-           }
         }
         cluster.setIsAirplaneMode(mAirplaneMode, mAirplaneIconId);
     }
