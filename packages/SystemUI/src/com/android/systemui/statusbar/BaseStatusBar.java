@@ -969,7 +969,8 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     protected void preloadRecentTasksList() {
         if (!mOmniSwitchEnabled){
-            if (mRecents != null) {
+        } else {
+			if (mRecents != null) {
                 mRecents.preloadRecentTasksList();
             }
         }
@@ -977,7 +978,8 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     protected void cancelPreloadingRecentTasksList() {
         if (!mOmniSwitchEnabled){
-            if (mRecents != null) {
+        } else {
+			if (mRecents != null) {
                 mRecents.cancelPreloadingRecentTasksList();
             }
         }
