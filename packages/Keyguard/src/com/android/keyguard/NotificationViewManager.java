@@ -69,7 +69,7 @@ public class NotificationViewManager {
 
     class Configuration extends ContentObserver {
         //User configurable values, set defaults here
-        public boolean showAlways = true;
+        public boolean showAlways = false;
         public boolean pocketMode = false;
         public boolean hideLowPriority = false;
         public boolean hideNonClearable = false;
