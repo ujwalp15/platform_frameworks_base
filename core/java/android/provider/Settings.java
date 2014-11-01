@@ -4044,12 +4044,6 @@ public final class Settings {
          */
         public static final String CLEAR_RECENTS_BUTTON = "clear_recents_button";
 
-        /*       
-         * Alternative recent apps integration using OmniSwitch
-         * @hide
-         */
-        public static final String RECENTS_USE_OMNISWITCH = "recents_use_omniswitch";
-
         /**
          * Recents RAM circle
          * 0 - off, 1 - top left, 2 - top right, 3 - bottom left, 4 - bottom right

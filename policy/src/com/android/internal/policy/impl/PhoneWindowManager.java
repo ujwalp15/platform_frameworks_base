@@ -235,6 +235,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     WindowManagerFuncs mWindowManagerFuncs;
     PowerManager mPowerManager;
     IStatusBarService mStatusBarService;
+    boolean mPreloadedRecentApps;
     final Object mServiceAquireLock = new Object();
     Vibrator mVibrator; // Vibrator for giving feedback of orientation changes
     SearchManager mSearchManager;
@@ -515,11 +516,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mConsumeSearchKeyUp;
 
     boolean mCallInBackground;
-
-    boolean mAssistKeyLongPressed;
-    
-    // Tracks preloading of the recent apps screen
-    private boolean mRecentAppsPreloaded;
 
     // support for activating the lock screen while the screen is on
     boolean mAllowLockscreenWhenOn;
@@ -2742,7 +2738,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             // Remember that home is pressed and handle special actions.
             if (down) {
-                if (!mRecentAppsPreloaded &&
+                if (!mPreloadedRecentApps &&
                         (mLongPressOnHomeBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mDoubleTapOnHomeBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mPressOnHomeBehavior.equals(ButtonsConstants.ACTION_RECENTS))) {
@@ -2829,7 +2825,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mMenuConsumed = false;
             } else if (down) {
                 // Remember that menu is pressed and handle special actions.
-                if (!mRecentAppsPreloaded &&
+                if (!mPreloadedRecentApps &&
                         (mLongPressOnMenuBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mDoubleTapOnMenuBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mPressOnMenuBehavior.equals(ButtonsConstants.ACTION_RECENTS))) {
@@ -2918,7 +2914,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             // Remember that AppSwitch is pressed and handle special actions.
             if (down) {
-                if (!mRecentAppsPreloaded &&
+                if (!mPreloadedRecentApps &&
                         (mLongPressOnAppSwitchBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mDoubleTapOnAppSwitchBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mPressOnAppSwitchBehavior.equals(ButtonsConstants.ACTION_RECENTS))) {
@@ -2989,7 +2985,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             // Remember that assistant key is pressed and handle special actions.
             if (down) {
-                if (!mRecentAppsPreloaded &&
+                if (!mPreloadedRecentApps &&
                         (mLongPressOnAssistBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mDoubleTapOnAssistBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mPressOnAssistBehavior.equals(ButtonsConstants.ACTION_RECENTS))) {
@@ -3094,7 +3090,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mBackConsumed = false;
             } else if (down) {
                 // Remember that back is pressed and handle special actions.
-                if (!mRecentAppsPreloaded &&
+                if (!mPreloadedRecentApps &&
                         (mLongPressOnBackBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mDoubleTapOnBackBehavior.equals(ButtonsConstants.ACTION_RECENTS)
                          || mPressOnBackBehavior.equals(ButtonsConstants.ACTION_RECENTS))) {
@@ -3245,7 +3241,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         // Reset the check flag for preloading to give it free
         // for next preload call.
-        mRecentAppsPreloaded = false;
+        mPreloadedRecentApps = false;
         SlimActions.processAction(mContext, action, false);
     }
 
@@ -3371,13 +3367,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return mSearchManager;
     }
 
-
     private void preloadRecentApps() {
+        mPreloadedRecentApps = true;
         try {
             IStatusBarService statusbar = getStatusBarService();
             if (statusbar != null) {
                 statusbar.preloadRecentApps();
-                mRecentAppsPreloaded = true;
             }
         } catch (RemoteException e) {
             Slog.e(TAG, "RemoteException when preloading recent apps", e);
@@ -3386,22 +3381,24 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-     private void cancelPreloadRecentApps() {
-        try {
-            IStatusBarService statusbar = getStatusBarService();
-            if (statusbar != null) {
-                statusbar.cancelPreloadRecentApps();
-                mRecentAppsPreloaded = false;
+    private void cancelPreloadRecentApps() {
+        if (mPreloadedRecentApps) {
+            mPreloadedRecentApps = false;
+            try {
+                IStatusBarService statusbar = getStatusBarService();
+                if (statusbar != null) {
+                    statusbar.cancelPreloadRecentApps();
+                }
+            } catch (RemoteException e) {
+                Slog.e(TAG, "RemoteException when showing recent apps", e);
+                // re-acquire status bar service next time it is needed.
+                mStatusBarService = null;
             }
-        } catch (RemoteException e) {
-            Slog.e(TAG, "RemoteException when showing recent apps", e);
-            // re-acquire status bar service next time it is needed.
-            mStatusBarService = null;
         }
     }
 
     private void toggleRecentApps() {
-        mRecentAppsPreloaded = false; // preloading no longer needs to be canceled
+        mPreloadedRecentApps = false; // preloading no longer needs to be canceled
         sendCloseSystemWindows(SYSTEM_DIALOG_REASON_RECENT_APPS);
         try {
             IStatusBarService statusbar = getStatusBarService();
