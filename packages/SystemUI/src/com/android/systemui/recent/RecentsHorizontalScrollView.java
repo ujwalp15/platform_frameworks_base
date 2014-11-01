@@ -249,7 +249,6 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     }
 
     public void onChildTriggered(View v) {
-        mCallback.handleFloat(v);
     }
 
     public void onBeginDrag(View v) {

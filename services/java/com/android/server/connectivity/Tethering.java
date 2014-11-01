@@ -542,15 +542,15 @@ public class Tethering extends INetworkManagementEventObserver.Stub {
             clearTetheredNotification();
         }
 
-        mScanThread = new HandlerThread("WifiClientScanner");
         if (wifiTethered && !bluetoothTethered) {
+            mScanThread = new HandlerThread("WifiClientScanner");
             if (!mScanThread.isAlive()) {
                 mScanThread.start();
                 mScanHandler = new WifiClientScanner(mScanThread.getLooper());
                 mScanHandler.sendEmptyMessage(0);
             }
         } else {
-            if (mScanThread.isAlive()) {
+            if (mScanThread != null && mScanThread.isAlive()) {
                 mScanThread.quit();
             }
         }
@@ -621,8 +621,8 @@ public class Tethering extends INetworkManagementEventObserver.Stub {
 
         @Override
         public void handleMessage(Message msg) {
-            mDoScan = new DoScan();
-            mDoScan.execute();
+            final DoScan doScan = new DoScan();
+            doScan.execute();
             sendEmptyMessageDelayed(0, 2000);
         }
     }
