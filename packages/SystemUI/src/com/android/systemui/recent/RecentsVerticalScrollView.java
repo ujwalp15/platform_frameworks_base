@@ -252,6 +252,7 @@ public class RecentsVerticalScrollView extends ScrollView
     }
 
     public void onChildTriggered(View v) {
+        mCallback.handleFloat(v);
     }
 
     public void onBeginDrag(View v) {

@@ -203,6 +203,14 @@ public class NotificationRowLayout
     }
 
     public void onChildTriggered(View v) {
+    if (DEBUG) Log.v(TAG, "onChildTriggered: " + v);
+        if (v != null && v instanceof ExpandableNotificationRow) {
+            mFloatNextNotification = true;
+            ViewGroup content = (ViewGroup)v.findViewById(R.id.content);
+            if (content != null) {
+                content.performClick();
+            }
+        }
     }
 
     public void onBeginDrag(View v) {
