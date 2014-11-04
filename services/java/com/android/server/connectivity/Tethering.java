@@ -137,8 +137,6 @@ public class Tethering extends INetworkManagementEventObserver.Stub {
     private final IConnectivityManager mConnService;
     private Looper mLooper;
 
-    private DoScan mDoScan;
-
     private HashMap<String, TetherInterfaceSM> mIfaces; // all tethered/tetherable ifaces
 
     private BroadcastReceiver mStateReceiver;
