@@ -17,9 +17,9 @@
 -->
 <resources>
 
-  <!-- Carbon Easter Egg -->
-  <!--java-symbol type="drawable" name="carbon_bg_logo" /-->
-  <!--java-symbol type="drawable" name="carbon_logo" /-->
+  <!-- OctOS Easter Egg -->
+  <!--java-symbol type="drawable" name="oct_bg_logo" /-->
+  <java-symbol type="drawable" name="oct_logo" />
 
   <!-- Package Manager -->
   <java-symbol type="array" name="config_disabledComponents" />
