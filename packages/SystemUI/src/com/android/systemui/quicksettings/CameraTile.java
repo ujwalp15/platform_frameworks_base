@@ -298,11 +298,23 @@ public class CameraTile extends QuickSettingsTile {
 
     @Override
     public void onClick(View v) {
-        if (mCamera == null) {
-            mHandler.post(mStartRunnable);
-        } else {
-            mHandler.post(mTakePictureRunnable);
-        }
+        final Intent intent = new Intent();
+        if (mCamera != null) {
+           intent.setAction(Intent.ACTION_VIEW);
+           intent.setType("image/*");
+
+           mHandler.post(mReleaseCameraRunnable);
+           mHandler.postDelayed(new Runnable() {
+
+               @Override
+               public void run() {
+                   startSettingsActivity(intent);
+               }
+           }, 150);
+       } else {
+          intent.setAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+          startSettingsActivity(intent);
+       }
     }
 
     @Override
