@@ -811,7 +811,6 @@
   <java-symbol type="string" name="mobile_provisioning_apn" />
   <java-symbol type="string" name="mobile_provisioning_url" />
   <java-symbol type="string" name="quick_contacts_not_available" />
-  <java-symbol type="string" name="reboot_confirm" />
   <java-symbol type="string" name="reboot_to_update_package" />
   <java-symbol type="string" name="reboot_to_update_prepare" />
   <java-symbol type="string" name="reboot_to_update_title" />
@@ -820,7 +819,6 @@
   <java-symbol type="string" name="reboot_to_reset_message" />
   <java-symbol type="string" name="reboot_safemode_confirm" />
   <java-symbol type="string" name="reboot_safemode_title" />
-  <java-symbol type="string" name="reboot_title" />
   <java-symbol type="string" name="relationTypeAssistant" />
   <java-symbol type="string" name="relationTypeBrother" />
   <java-symbol type="string" name="relationTypeChild" />
@@ -1455,8 +1453,6 @@
   <java-symbol type="array" name="config_safeModeEnabledVibePattern" />
   <java-symbol type="array" name="config_contextClickVibePattern" />
   <java-symbol type="array" name="config_virtualKeyVibePattern" />
-  <java-symbol type="array" name="shutdown_reboot_options" />
-  <java-symbol type="array" name="shutdown_reboot_actions" />
   <java-symbol type="attr" name="actionModePopupWindowStyle" />
   <java-symbol type="attr" name="dialogCustomTitleDecorLayout" />
   <java-symbol type="attr" name="dialogTitleDecorLayout" />
@@ -1485,7 +1481,6 @@
   <java-symbol type="drawable" name="ic_jog_dial_vibrate_on" />
   <java-symbol type="drawable" name="ic_lock_airplane_mode" />
   <java-symbol type="drawable" name="ic_lock_airplane_mode_off" />
-  <java-symbol type="drawable" name="ic_lock_power_reboot" />
   <java-symbol type="drawable" name="ic_menu_cc" />
   <java-symbol type="drawable" name="jog_tab_bar_left_unlock" />
   <java-symbol type="drawable" name="jog_tab_bar_right_sound_off" />
@@ -1558,7 +1553,6 @@
   <java-symbol type="string" name="global_actions_airplane_mode_on_status" />
   <java-symbol type="string" name="global_actions_toggle_airplane_mode" />
   <java-symbol type="string" name="global_action_bug_report" />
-  <java-symbol type="string" name="global_action_reboot" />
   <java-symbol type="string" name="global_action_settings" />
   <java-symbol type="string" name="global_action_silent_mode_off_status" />
   <java-symbol type="string" name="global_action_silent_mode_on_status" />
@@ -2325,11 +2319,5 @@
   <java-symbol type="drawable" name="ic_more_items" />
 
   <java-symbol type="drawable" name="platlogo_m" />
-
-  <!-- Power menu -->
-  <java-symbol type="drawable" name="ic_lock_screenshot" />
-  <java-symbol type="string" name="global_action_screenshot" />
-  <java-symbol type="drawable" name="ic_lock_settings" />
-  <java-symbol type="drawable" name="ic_lock_user" />
 
 </resources>
