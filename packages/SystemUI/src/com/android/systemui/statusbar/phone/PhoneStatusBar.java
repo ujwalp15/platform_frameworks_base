@@ -232,11 +232,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
             .build();
 
-    public static final int FADE_KEYGUARD_START_DELAY = 100;
-    public static final int FADE_KEYGUARD_DURATION = 300;
+    public static final int FADE_KEYGUARD_START_DELAY = 50;
+    public static final int FADE_KEYGUARD_DURATION = 150;
 
     /** Allow some time inbetween the long press for back and recents. */
-    private static final int LOCK_TO_APP_GESTURE_TOLERENCE = 200;
+    private static final int LOCK_TO_APP_GESTURE_TOLERENCE = 100;
 
     /** If true, the system is in the half-boot-to-decryption-screen state.
      * Prudently disable QS and notifications.  */
@@ -1501,7 +1501,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             nlo.animate()
                 .alpha(showDot?1:0)
                 .setDuration(showDot?750:250)
-                .setInterpolator(new AccelerateInterpolator(2.0f))
+                .setInterpolator(new AccelerateInterpolator(1.0f))
                 .setListener(showDot ? null : new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator _a) {
@@ -1736,7 +1736,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                                 + mBackdropBack.getDrawable());
                     }
                     mBackdropFront.animate()
-                            .setDuration(250)
+                            .setDuration(150)
                             .alpha(0f).withEndAction(mHideBackdropFront);
                 }
             }
@@ -1753,7 +1753,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         // if mScrimSrcModeEnabled. Note that 0.001 is rounded down to 0 in libhwui.
                         .alpha(0.002f)
                         .setInterpolator(mBackdropInterpolator)
-                        .setDuration(300)
+                        .setDuration(150)
                         .setStartDelay(0)
                         .withEndAction(new Runnable() {
                             @Override
