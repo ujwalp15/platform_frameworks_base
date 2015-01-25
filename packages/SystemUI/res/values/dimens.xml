@@ -249,7 +249,7 @@
     <dimen name="recents_search_bar_space_height">64dp</dimen>
 
     <!-- The side padding for the task stack as a percentage of the width. -->
-    <item name="recents_stack_width_padding_percentage" format="float" type="dimen">0.03333</item>
+    <item name="recents_stack_width_padding_percentage" format="float" type="dimen">0.06666</item>
 
     <!-- The overscroll percentage allowed on the stack. -->
     <item name="recents_stack_overscroll_percentage" format="float" type="dimen">0.0875</item>
@@ -257,7 +257,7 @@
     <!-- The top offset for the task stack. -->
     <dimen name="recents_stack_top_padding">16dp</dimen>
 
-    <!-- Used to calculate the translation animation duration, the expected amount of movement 
+    <!-- Used to calculate the translation animation duration, the expected amount of movement
          in dps over one second of time. -->
     <dimen name="recents_animation_movement_in_dps_per_second">800dp</dimen>
 
