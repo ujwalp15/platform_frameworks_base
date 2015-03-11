@@ -266,6 +266,9 @@ public interface MetricsConstants {
     // Notification drawer settings
     public static final int NOTIFICATION_DRAWER_SETTINGS = 247;
 
+    // Lock screen weather settings
+    public static final int LOCKSCREEN_WEATHER_SETTINGS = 248;
+
     // QS Tiles
     public static final int QS_BRIGHTNESS = 239;
     public static final int QS_SCREEN_OFF = 240;
