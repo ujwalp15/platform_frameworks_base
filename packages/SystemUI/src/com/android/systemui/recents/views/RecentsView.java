@@ -325,7 +325,7 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
         }
 
         boolean showClearAllRecents = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.SHOW_CLEAR_ALL_RECENTS, 1) == 1;
+                Settings.System.SHOW_CLEAR_ALL_RECENTS, 0) == 1;
 
         Rect taskStackBounds = new Rect();
         mConfig.getTaskStackBounds(width, height, mConfig.systemInsets.top,
@@ -344,16 +344,21 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
                     params.gravity = Gravity.TOP | Gravity.LEFT;
                     break;
                 case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_TOP_RIGHT:
-                default:
                     params.gravity = Gravity.TOP | Gravity.RIGHT;
                     break;
-                case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_RIGHT:
-                    params.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+                case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_TOP_CENTER:
+                    params.gravity = Gravity.TOP | Gravity.CENTER;
                     break;
-                case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_LEFT:
+                  case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_LEFT:
                     params.gravity = Gravity.BOTTOM | Gravity.LEFT;
                     break;
-
+                case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_RIGHT:
+                default:
+                    params.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+                    break;
+                case Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_CENTER:
+                     params.gravity = Gravity.BOTTOM | Gravity.CENTER;
+                     break;
             }
             mClearRecents.setLayoutParams(params);
         } else {
