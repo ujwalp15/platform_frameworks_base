@@ -3426,6 +3426,11 @@ public final class Settings {
          * @hide
          */
         public static final String GESTURES_LEFT_SWIPE = "gestures_left_swipe";
+        /**
+         * Status bar greeting
+         * @hide
+	 */
+	public static final String STATUS_BAR_GREETING = "status_bar_greeting";
 
         /**
          * Right Swipe Action

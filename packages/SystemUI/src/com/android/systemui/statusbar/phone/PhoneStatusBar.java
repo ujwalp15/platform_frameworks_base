@@ -70,6 +70,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.IPowerManager;
+import android.text.TextUtils;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
@@ -338,6 +339,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     Object mQueueLock = new Object();
 
     StatusBarIconController mIconController;
+    TextView mBlissLabel;
 
     // expanded notifications
     NotificationPanelView mNotificationPanel; // the sliding/resizing panel within the notification window
@@ -348,6 +350,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private QSDragPanel mQSPanel;
     private QSTileHost mQSTileHost;
     private DevForceNavbarObserver mDevForceNavbarObserver;
+    String mGreeting = "";
 
     // top bar
     StatusBarHeaderView mHeader;
@@ -368,6 +371,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private Bitmap mKeyguardWallpaper;
 
     int mKeyguardMaxNotificationCount;
+
+    private boolean mShowLabel;
 
     boolean mExpandedVisible;
 
@@ -451,6 +456,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SCREEN_BRIGHTNESS_MODE), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                                        Settings.System.STATUS_BAR_GREETING),
+                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(CMSettings.System.getUriFor(
                     CMSettings.System.NAVBAR_LEFT_IN_LANDSCAPE), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(CMSettings.System.getUriFor(
@@ -476,6 +484,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mBrightnessControl = CMSettings.System.getIntForUser(
                     resolver, CMSettings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0,
                     UserHandle.USER_CURRENT) == 1;
+          
+            mGreeting = Settings.System.getStringForUser(resolver,
+			Settings.System.STATUS_BAR_GREETING,
+			UserHandle.USER_CURRENT);
+            if (mGreeting != null && !TextUtils.isEmpty(mGreeting))    
+		mBlissLabel.setText(mGreeting);
+
 
             if (mNavigationBarView != null) {
                 boolean navLeftInLandscape = CMSettings.System.getIntForUser(resolver,
@@ -967,6 +982,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mStackScroller = (NotificationStackScrollLayout) mStatusBarWindowContent.findViewById(
                 R.id.notification_stack_scroller);
+        mBlissLabel = (TextView)mStatusBarView.findViewById(R.id.bliss_custom_label);
         mStackScroller.setLongPressListener(getNotificationLongClicker());
         mStackScroller.setPhoneStatusBar(this);
         mStackScroller.setGroupManager(mGroupManager);
@@ -2278,6 +2294,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
      */
     public void disable(int state1, int state2, boolean animate) {
         animate &= mStatusBarWindowState != WINDOW_STATE_HIDDEN;
+        final boolean animate2 = animate;
         mDisabledUnmodified1 = state1;
         mDisabledUnmodified2 = state2;
         state1 = adjustDisableFlags(state1);
@@ -2324,9 +2341,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         if ((diff1 & StatusBarManager.DISABLE_SYSTEM_INFO) != 0) {
             if ((state1 & StatusBarManager.DISABLE_SYSTEM_INFO) != 0) {
-                mIconController.hideSystemIconArea(animate);
+                mIconController.hideSystemIconArea(animate2);
             } else {
-                mIconController.showSystemIconArea(animate);
+                mIconController.showSystemIconArea(animate2);
             }
         }
 
@@ -2356,9 +2373,30 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         if ((diff1 & StatusBarManager.DISABLE_NOTIFICATION_ICONS) != 0) {
             if ((state1 & StatusBarManager.DISABLE_NOTIFICATION_ICONS) != 0) {
-                mIconController.hideNotificationIconArea(animate);
+                mIconController.hideNotificationIconArea(animate2);
             } else {
-                mIconController.showNotificationIconArea(animate);
+            if (mGreeting != null && !TextUtils.isEmpty(mGreeting) && mShowLabel) {
+                if (animate2) {
+                    mBlissLabel.setVisibility(View.VISIBLE);
+						mBlissLabel.animate().cancel();
+						mBlissLabel.animate()
+								.alpha(1f)
+								.setDuration(320)
+								.setInterpolator(ALPHA_IN)
+								.setStartDelay(50)
+								.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								labelAnimatorFadeOut(animate2);
+							}
+						});
+					} else {
+						labelAnimatorFadeOut(animate2);
+					}
+					mShowLabel = false;
+				} else {
+					mIconController.showNotificationIconArea(animate2);
+				}
             }
         }
 
@@ -2373,6 +2411,22 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
+    protected void labelAnimatorFadeOut(final boolean animate) {
+		mBlissLabel.animate().cancel();
+		mBlissLabel.animate()
+				.alpha(0f)
+				.setDuration(200)
+				.setStartDelay(1200)
+				.setInterpolator(ALPHA_OUT)
+				.withEndAction(new Runnable() {
+			@Override
+			public void run() {
+				mBlissLabel.setVisibility(View.GONE);
+				mIconController.showNotificationIconArea(animate);
+			}
+		});
+	}
+ 
     @Override
     protected BaseStatusBar.H createHandler() {
         return new PhoneStatusBar.H();
@@ -3497,6 +3551,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
             else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                 mScreenOn = false;
+                mShowLabel = true;
                 notifyNavigationBarScreenOn(false);
                 notifyHeadsUpScreenOff();
                 finishBarAnimations();
@@ -5391,7 +5446,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         handleStopDozing();
                         break;
                 }
-            }
-        }
+           }
+       }
     }
 }
