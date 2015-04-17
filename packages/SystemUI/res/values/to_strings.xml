@@ -26,4 +26,6 @@
     <!--FIXME -->
     <string name="bliss">Octos</string>
 
+    <string name="quick_settings_tentacles_label">Tentacles</string>
+
 </resources>
