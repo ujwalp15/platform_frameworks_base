@@ -55,9 +55,9 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
     private final AudioManager mAudioManager;
     private final int mStreamType;
     private final int mMaxStreamVolume;
+    private final boolean mVoiceCapable;
     private boolean mAffectedByRingerMode;
     private boolean mNotificationOrRing;
-    private boolean mIsRing;
     private final Receiver mReceiver = new Receiver();
 
     private Handler mHandler;
@@ -82,11 +82,12 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
         mStreamType = streamType;
         mAffectedByRingerMode = mAudioManager.isStreamAffectedByRingerMode(mStreamType);
         mNotificationOrRing = isNotificationOrRing(mStreamType);
-        mIsRing = isRing(mStreamType);
         if (mNotificationOrRing) {
             mRingerMode = mAudioManager.getRingerModeInternal();
         }
         mMaxStreamVolume = mAudioManager.getStreamMaxVolume(mStreamType);
+        mVoiceCapable = context.getResources().getBoolean(
+                            com.android.internal.R.bool.config_voice_capable);
         mCallback = callback;
         mOriginalStreamVolume = mAudioManager.getStreamVolume(mStreamType);
         mMuted = mAudioManager.isStreamMute(mStreamType);
@@ -111,12 +112,8 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
     }
 
     private boolean isNotificationStreamLinked() {
-        return Settings.Secure.getInt(mContext.getContentResolver(),
+        return mVoiceCapable && Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.VOLUME_LINK_NOTIFICATION, 1) == 1;
-    }
-
-    private static boolean isRing(int stream) {
-        return stream == AudioManager.STREAM_RING;
     }
 
     public void setSeekBar(SeekBar seekBar) {
@@ -131,28 +128,21 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
     }
 
     protected void updateSeekBar() {
-        final boolean linkEnabled = Settings.System.getInt(mContext.getContentResolver(),
-            Settings.Secure.VOLUME_LINK_NOTIFICATION, 1) == 1;
-
-        boolean enableVibrateBar = false;
-        if (mRingerMode == AudioManager.RINGER_MODE_VIBRATE) {
-            if (linkEnabled) {
-                enableVibrateBar = mNotificationOrRing;
-            } else {
-                // only enable the ringer stream seekbar cause
-                // only via this stream ringer mode can be changed
-                enableVibrateBar = mIsRing;
-            }
-            mSeekBar.setEnabled(enableVibrateBar);
+        if (mNotificationOrRing && mRingerMode == AudioManager.RINGER_MODE_VIBRATE) {
+            mSeekBar.setEnabled(enableSeekBar());
             mSeekBar.setProgress(0);
         } else if (mMuted) {
             mSeekBar.setEnabled(false);
             mSeekBar.setProgress(0);
         } else {
-            mSeekBar.setEnabled(mStreamType != AudioManager.STREAM_NOTIFICATION
-                    || !isNotificationStreamLinked());
+            mSeekBar.setEnabled(enableSeekBar());
             mSeekBar.setProgress(mLastProgress > -1 ? mLastProgress : mOriginalStreamVolume);
         }
+    }
+
+    private boolean enableSeekBar() {
+        return mStreamType != AudioManager.STREAM_NOTIFICATION
+                || !isNotificationStreamLinked();
     }
 
     @Override
@@ -249,7 +239,7 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
     }
 
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-        if (fromTouch) {
+        if (fromTouch && enableSeekBar()) {
             postSetVolume(progress);
         }
         if (mCallback != null) {
@@ -390,14 +380,8 @@ public class SeekBarVolumizer implements OnSeekBarChangeListener, Handler.Callba
             if (AudioManager.VOLUME_CHANGED_ACTION.equals(action)) {
                 int streamType = intent.getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_TYPE, -1);
                 int streamValue = intent.getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_VALUE, -1);
-                final boolean linkEnabled = Settings.System.getInt(context.getContentResolver(),
-                        Settings.Secure.VOLUME_LINK_NOTIFICATION, 1) == 1;
-                boolean streamMatch = streamType == mStreamType;
-                if (mNotificationOrRing) {
-                    if (linkEnabled) {
-                        streamMatch = isNotificationOrRing(streamType);
-                     }
-                }
+                final boolean streamMatch = mNotificationOrRing ? isNotificationOrRing(streamType)
+                        : (streamType == mStreamType);
                 if (mSeekBar != null && streamMatch && streamValue != -1) {
                     final boolean muted = mAudioManager.isStreamMute(mStreamType);
                     mUiHandler.postUpdateSlider(streamValue, muted);
