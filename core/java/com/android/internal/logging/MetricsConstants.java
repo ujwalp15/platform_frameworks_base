@@ -277,6 +277,9 @@ public interface MetricsConstants {
     public static final int QS_HEADSUP = 243;
     public static final int QS_TENTACLES = 244;
 
+    // Location tile
+    public static final int QS_LOCATION_DETAILS = 249;
+
     // These constants must match those in the analytic pipeline, do not edit.
     // Add temporary values to the top of MetricsLogger instead.
 
