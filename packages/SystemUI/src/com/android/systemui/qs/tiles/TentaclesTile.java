@@ -31,9 +31,9 @@ import com.android.systemui.qs.QSTile;
 public class TentaclesTile extends QSTile<QSTile.BooleanState> {
 
     private static final Intent TENTACLES_SETTINGS = new Intent().setComponent(new ComponentName(
-            "com.android.settings", "com.android.settings.Settings$OctosSettingsActivity"));
+            "com.android.settings", "com.android.settings.Settings$TentaclesActivity"));
     private static final Intent ABOUT_OCTOS = new Intent().setComponent(new ComponentName(
-            "com.about.octos.aboutoctos", "com.about.octos.aboutoctos.AboutActivity"));
+            "com.about.octos.aboutoctos", "com.about.octos.aboutoctos.AboutOctOs"));
 
     public TentaclesTile(Host host) {
         super(host);
