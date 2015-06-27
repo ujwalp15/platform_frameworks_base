@@ -16,6 +16,9 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -23,16 +26,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.media.session.PlaybackState;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.UserHandle;
 import android.provider.Settings;
+import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -52,7 +57,8 @@ import com.pheelicks.visualizer.renderer.Renderer;
 /**
  * A view who contains media artwork.
  */
-public class BackDropView extends FrameLayout {
+public class BackDropView extends FrameLayout implements Palette.PaletteAsyncListener,
+        ValueAnimator.AnimatorUpdateListener {
     final static String TAG = BackDropView.class.getSimpleName();
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
@@ -73,41 +79,25 @@ public class BackDropView extends FrameLayout {
     private boolean mTouching;
     private MediaMonitor mMediaMonitor;
     private Handler mHandler;
+    private LockscreenBarEqRenderer mBarRenderer;
+    private ValueAnimator mVisualizerColorAnimator;
+    private boolean mAnimatingOn;
 
     public BackDropView(Context context) {
         super(context);
-        init();
     }
 
     public BackDropView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public BackDropView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     public BackDropView(Context context, AttributeSet attrs, int defStyleAttr,
                         int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
-    }
-
-    private void init() {
-        mHandler = new Handler();
-        mMediaMonitor = new MediaMonitor(mContext) {
-            @Override
-            public void onPlayStateChanged(boolean playing) {
-                if (playing) {
-                    requestVisualizer(true, 500);
-                } else {
-                    // user paused, hide visualizer to stop flash
-                    requestVisualizer(false, 0);
-                }
-            }
-        };
     }
 
     @Override
@@ -141,10 +131,34 @@ public class BackDropView extends FrameLayout {
             mSettingsObserver = new SettingsObserver(new Handler());
         }
         mSettingsObserver.observe();
+
+        HandlerThread handlerThread = new HandlerThread(TAG,
+                android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        handlerThread.start();
+        mHandler = new Handler(handlerThread.getLooper());
+        mMediaMonitor = new MediaMonitor(mContext) {
+            @Override
+            public void onPlayStateChanged(boolean playing) {
+                if (playing) {
+                    if (mVisualizerColorAnimator != null && !mVisualizerColorAnimator.isStarted()) {
+                        mVisualizerColorAnimator.start();
+                    }
+                    requestVisualizer(true, 500);
+                } else {
+                    requestVisualizer(false, 0);
+                }
+            }
+        };
+        mMediaMonitor.setListening(true);
     }
 
     @Override
     protected void onDetachedFromWindow() {
+        mMediaMonitor.setListening(false);
+        haltVisualizer();
+        mHandler.getLooper().quit();
+        mHandler = null;
+
         super.onDetachedFromWindow();
         mSettingsObserver.unobserve();
         mContext.unregisterReceiver(mReceiver);
@@ -168,17 +182,60 @@ public class BackDropView extends FrameLayout {
                 }, 0));
 
                 int bars = res.getInteger(R.integer.kg_visualizer_divisions);
-                mVisualizer.addRenderer(new LockscreenBarEqRenderer(bars, paint,
+                mBarRenderer = new LockscreenBarEqRenderer(bars, paint,
                         res.getInteger(R.integer.kg_visualizer_db_fuzz),
-                        res.getInteger(R.integer.kg_visualizer_db_fuzz_factor)));
+                        res.getInteger(R.integer.kg_visualizer_db_fuzz_factor));
+                mVisualizer.addRenderer(mBarRenderer);
             }
         }
         KeyguardUpdateMonitor.getInstance(mContext).registerCallback(mUpdateMonitorCallback);
     }
 
+    public void updateVisualizerColor(Bitmap artwork) {
+        if (artwork != null) {
+            Palette.generateAsync(artwork, this);
+        } else {
+            if (mVisualizerColorAnimator != null) {
+                mVisualizerColorAnimator.cancel();
+            }
+            mVisualizerColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(),
+                    mBarRenderer.mPaint.getColor(),
+                    getResources().getColor(R.color.equalizer_fill_color)
+            );
+            mVisualizerColorAnimator.setStartDelay(500);
+            mVisualizerColorAnimator.setDuration(1000);
+            mVisualizerColorAnimator.addUpdateListener(this);
+            if (mMediaMonitor.isAnythingPlaying()) {
+                mVisualizerColorAnimator.start();
+            }
+        }
+    }
+
+    @Override
+    public void onGenerated(Palette palette) {
+        if (mVisualizerColorAnimator != null) {
+            mVisualizerColorAnimator.cancel();
+        }
+        mVisualizerColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(),
+                mBarRenderer.mPaint.getColor(),
+                palette.getLightVibrantColor(getResources().getColor(R.color.equalizer_fill_color))
+        );
+        mVisualizerColorAnimator.setStartDelay(500);
+        mVisualizerColorAnimator.setDuration(1000);
+        mVisualizerColorAnimator.addUpdateListener(this);
+        if (mMediaMonitor.isAnythingPlaying()) {
+            mVisualizerColorAnimator.start();
+        }
+    }
+
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+        mBarRenderer.mPaint.setColor((Integer) animation.getAnimatedValue());
+    }
+
     public void setTouching(boolean touching) {
-        if (DEBUG) Log.d(TAG, "setTouching() called with " + "touching = [" + touching + "]");
         if (mTouching != touching) {
+            if (DEBUG) Log.d(TAG, "setTouching() called with touching = [" + touching + "]");
             mTouching = touching;
             if (mTouching) {
                 // immediately hide visualizer
@@ -190,31 +247,54 @@ public class BackDropView extends FrameLayout {
         }
     }
 
-    public void requestVisualizer(boolean show, int delay) {
+    /**
+     * Show or hide the visualizer
+     *
+     * @param show True to request visualizer to be visible, false to hide it.
+     *             request may not happen based on other conditions.
+     *             Pass null to decisively pick one, or the other, based on the current state.
+     * @param delay How long to wait before doing the requested action.
+     */
+    public void requestVisualizer(Boolean show, int delay) {
         if (mVisualizer == null || !mVisualizerEnabled || mPowerSaveModeEnabled) {
             return;
         }
         mHandler.removeCallbacks(mStartVisualizer);
         mHandler.removeCallbacks(mStopVisualizer);
+
         if (DEBUG) Log.v(TAG, "requestVisualizer(show: " + show + ", delay: " + delay + ")");
-        if (show && mScreenOn
+        if ((show == null || show) && mScreenOn
                 && mPhoneStatusBar.getBarState() == StatusBarState.KEYGUARD
                 && !mPhoneStatusBar.isKeyguardFadingAway()
                 && !mPhoneStatusBar.isGoingToNotificationShade()
                 && !mPhoneStatusBar.isInLaunchTransition()
                 && !mPhoneStatusBar.isQsExpanded()
                 && mPhoneStatusBar.getCurrentMediaNotificationKey() != null
-                && mStack.getActivatedChild() == null
-                ) {
+                && mStack.getActivatedChild() == null) {
+            if (show == null) {
+                // be a little more aggresive when we're unsure of what to expect
+                if (!mMediaMonitor.isAnythingPlaying()) {
+                    return;
+                }
+                if (mTouching) {
+                    mHandler.postDelayed(mResumeVisualizerIfPlayingRunnable, 500);
+                    return;
+                }
+            }
+
             if (DEBUG) Log.d(TAG, "--> starting visualizer");
             mHandler.postDelayed(mStartVisualizer, delay);
-        } else if (!show) {
+        } else if ((show == null || !show)) {
             if (DEBUG) Log.d(TAG, "--> stopping visualizer");
             mHandler.postDelayed(mStopVisualizer, delay);
         }
     }
 
     private void haltVisualizer() {
+        if (mVisualizerColorAnimator != null) {
+            mVisualizerColorAnimator.end();
+            mVisualizerColorAnimator = null;
+        }
         mHandler.removeCallbacks(mResumeVisualizerIfPlayingRunnable);
         mHandler.removeCallbacks(mStartVisualizer);
         mHandler.removeCallbacks(mStopVisualizer);
@@ -241,8 +321,32 @@ public class BackDropView extends FrameLayout {
         public void run() {
             if (DEBUG) Log.w(TAG, "mStartVisualizer");
 
+            mHandler.removeCallbacks(mStartVisualizer);
+
+            mVisualizer.animate().cancel();
             mVisualizer.animate()
                     .alpha(1f)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            mAnimatingOn = true;
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            mAnimatingOn = false;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                            mAnimatingOn = false;
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    })
                     .setDuration(VISUALIZER_ANIMATION_DURATION_IN);
             AsyncTask.execute(mLinkVisualizerRunnable);
         }
@@ -253,10 +357,13 @@ public class BackDropView extends FrameLayout {
         public void run() {
             if (DEBUG) Log.w(TAG, "mStopVisualizer");
 
+            mHandler.removeCallbacks(mStopVisualizer);
+
+            mVisualizer.animate().cancel();
             mVisualizer.animate()
                     .alpha(0f)
                     .setDuration(VISUALIZER_ANIMATION_DURATION_OUT);
-            AsyncTask.execute(mUninkVisualizerRunnable);
+            AsyncTask.execute(mUnLinkVisualizerRunnable);
         }
     };
 
@@ -270,7 +377,7 @@ public class BackDropView extends FrameLayout {
         }
     };
 
-    private final Runnable mUninkVisualizerRunnable = new Runnable() {
+    private final Runnable mUnLinkVisualizerRunnable = new Runnable() {
         @Override
         public void run() {
             if (mVisualizer != null && mLinked) {
@@ -283,8 +390,9 @@ public class BackDropView extends FrameLayout {
     private Runnable mResumeVisualizerIfPlayingRunnable = new Runnable() {
         @Override
         public void run() {
+            if (DEBUG) Log.i(TAG, "mResumeVisualizerIfPlayingRunnable");
             if (mMediaMonitor.isAnythingPlaying()) {
-                requestVisualizer(true, 250);
+                requestVisualizer(null, 250);
             }
         }
     };
@@ -304,7 +412,7 @@ public class BackDropView extends FrameLayout {
                 @Override
                 public void onScreenTurnedOff(int why) {
                     mScreenOn = false;
-                    haltVisualizer();
+                    requestVisualizer(false, 0);
                 }
 
                 @Override
@@ -320,11 +428,14 @@ public class BackDropView extends FrameLayout {
                 }
             };
 
-    private static class LockscreenBarEqRenderer extends Renderer {
+    private class LockscreenBarEqRenderer extends Renderer {
         private int mDivisions;
         private Paint mPaint;
         private int mDbFuzz;
         private int mDbFuzzFactor;
+
+        private boolean mDrawEmpty;
+        int mFramesSinceLastEmptyRender;
 
         /**
          * Renders the FFT data as a series of lines, in histogram form
@@ -353,20 +464,56 @@ public class BackDropView extends FrameLayout {
 
         @Override
         public void onRender(Canvas canvas, FFTData data, Rect rect) {
-            for (int i = 0; i < data.bytes.length / mDivisions; i++) {
-                mFFTPoints[i * 4] = i * 4 * mDivisions;
-                mFFTPoints[i * 4 + 2] = i * 4 * mDivisions;
-                byte rfk = data.bytes[mDivisions * i];
-                byte ifk = data.bytes[mDivisions * i + 1];
-                float magnitude = (rfk * rfk + ifk * ifk);
-                int dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+            if (isDataEmpty(data)) {
+                mDrawEmpty = true;
+                mFramesSinceLastEmptyRender = 0;
+            } else {
+                mFramesSinceLastEmptyRender++;
+                for (int i = 0; i < data.bytes.length / mDivisions; i++) {
+                    mFFTPoints[i * 4] = i * 4 * mDivisions;
+                    mFFTPoints[i * 4 + 2] = i * 4 * mDivisions;
+                    byte rfk = data.bytes[mDivisions * i];
+                    byte ifk = data.bytes[mDivisions * i + 1];
+                    float magnitude = (rfk * rfk + ifk * ifk);
+                    int dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
 
-                mFFTPoints[i * 4 + 1] = rect.height();
-                mFFTPoints[i * 4 + 3] = rect.height() - ((dbValue * mDbFuzzFactor) + mDbFuzz);
+                    mFFTPoints[i * 4 + 1] = rect.height();
+                    mFFTPoints[i * 4 + 3] = rect.height() - ((dbValue * mDbFuzzFactor) + mDbFuzz);
+                }
             }
 
-            canvas.drawLines(mFFTPoints, mPaint);
+             /*
+              * When transitioning songs, we get a bunch of empty frames, followed by 1 frame
+              * as the track switch occurs, then some more empty frames until the song starts.
+              *
+              * We skip the first frame in between empty frames here to avoid drawing
+              * anything when we're switching songs
+              */
+            mDrawEmpty = mFramesSinceLastEmptyRender == 1;
+
+            if (mFramesSinceLastEmptyRender == 1) {
+                //
+                mDrawEmpty = true;
+            }
+
+            // if the 'on' animation is currently running, then always draw
+            if (mDrawEmpty && !mAnimatingOn) {
+                mVisualizer.setDrawingEnabled(false);
+            } else {
+                mVisualizer.setDrawingEnabled(true);
+                canvas.drawLines(mFFTPoints, mPaint);
+            }
         }
+
+        private boolean isDataEmpty(FFTData data) {
+            for (int i = 0; i < data.bytes.length; i++) {
+                if (data.bytes[i] != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 
     private class SettingsObserver extends UserContentObserver {
