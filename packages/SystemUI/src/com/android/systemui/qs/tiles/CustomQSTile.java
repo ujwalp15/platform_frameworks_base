@@ -52,6 +52,7 @@ public class CustomQSTile extends QSTile<QSTile.State> {
     private int mCurrentUserId;
     private StatusBarPanelCustomTile mTile;
     private CustomQSDetailAdapter mDetailAdapter;
+    private boolean mCollapsePanel;
 
     public CustomQSTile(Host host, StatusBarPanelCustomTile tile) {
         super(host);
@@ -95,12 +96,14 @@ public class CustomQSTile extends QSTile<QSTile.State> {
             if (mExpandedStyle != null &&
                     mExpandedStyle.getStyle() != CustomTile.ExpandedStyle.NO_STYLE) {
                 showDetail(true);
+                return;
+            }
+            if (mCollapsePanel) {
+                mHost.collapsePanels();
             }
             if (mOnClick != null) {
-                mHost.collapsePanels();
                 mOnClick.send();
             } else if (mOnClickUri != null) {
-                mHost.collapsePanels();
                 final Intent intent = new Intent().setData(mOnClickUri);
                 mContext.sendBroadcastAsUser(intent, new UserHandle(mCurrentUserId));
             }
@@ -131,6 +134,7 @@ public class CustomQSTile extends QSTile<QSTile.State> {
         mOnClick = customTile.onClick;
         mOnClickUri = customTile.onClickUri;
         mExpandedStyle = customTile.expandedStyle;
+        mCollapsePanel = customTile.collapsePanel;
         mDetailAdapter = new CustomQSDetailAdapter();
     }
 
@@ -146,9 +150,12 @@ public class CustomQSTile extends QSTile<QSTile.State> {
 
         public int getTitle() {
             if (isDynamicTile()) {
-                return mContext.getResources().getIdentifier(
+                int resId = mContext.getResources().getIdentifier(
                         String.format("dynamic_qs_tile_%s_label", mTile.getTag()),
                             "string", mContext.getPackageName());
+                if (resId != 0) {
+                    return resId;
+                }
             }
             return R.string.quick_settings_custom_tile_detail_title;
         }
