@@ -55,6 +55,7 @@ import com.android.systemui.qs.tiles.HeadsUpTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LteTile;
+import com.android.systemui.qs.tiles.KernelAdiutorTile;
 import com.android.systemui.qs.tiles.LocationTile;
 import com.android.systemui.qs.tiles.LockscreenToggleTile;
 import com.android.systemui.qs.tiles.NfcTile;
@@ -391,6 +392,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
         else if (tileSpec.equals("tentacles")) return new TentaclesTile(this);
         else if (tileSpec.equals("lte")) return new LteTile(this);
+	else if (tileSpec.equals("kernel")) return new KernelAdiutorTile(this);
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
         else if (TextUtils.split(tileSpec, "\\|").length == 3) {
             /** restores placeholder for
@@ -490,6 +492,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("caffeine")) return R.string.quick_settings_caffeine_label;
         else if (spec.equals("tentacles")) return R.string.quick_settings_tentacles_label;
         else if (spec.equals("lte")) return R.string.qs_lte_label;
+        else if (spec.equals("kernel")) return R.string.quick_settings_kernel_adiutor_label;
         return 0;
     }
 
@@ -520,7 +523,9 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("heads_up")) return R.drawable.ic_qs_heads_up_on;
         else if (spec.equals("battery_saver")) return R.drawable.ic_qs_battery_saver_on;
         else if (spec.equals("caffeine")) return R.drawable.ic_qs_caffeine_on;
+        else if (spec.equals("tentacles")) return R.drawable.ic_qs_tentacles;
         else if (spec.equals("lte")) return R.drawable.ic_qs_lte_on;
+        else if (spec.equals("kernel")) return R.drawable.ic_qs_kernel;
         return 0;
     }
 

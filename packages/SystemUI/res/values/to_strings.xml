@@ -55,4 +55,7 @@
     <string name="weather_info_not_available">Weather information is not available</string>
     <string name="weather_info_not_available2">Long press here to enable weather</string>
 
+    <!-- QuickSettings: KernelAdiutor -->
+    <string name="quick_settings_kernel_adiutor_label">Kernel Adiutor</string>
+
 </resources>
