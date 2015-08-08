@@ -4208,8 +4208,13 @@ public final class Settings {
         public static final String ENABLE_FORWARD_LOOKUP = "enable_forward_lookup";
 
         /**
+         * Three Finger Gesture from Oppo
+         * @hide
+         */
+        public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
+
+        /**
          * Enable looking up of phone numbers of people
-         *
          * @hide
          */
         public static final String ENABLE_PEOPLE_LOOKUP = "enable_people_lookup";
