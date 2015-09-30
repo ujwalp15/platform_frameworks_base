@@ -1505,9 +1505,11 @@ public class PackageManagerService extends IPackageManager.Stub {
 
             mRestoredSettings = mSettings.readLPw(this, sUserManager.getUsers(false),
                     mSdkVersion, mOnlyCore);
-
-            String customResolverActivity = Resources.getSystem().getString(
-                    R.string.config_customResolverActivity);
+            String customResolverActivity = SystemProperties.get("ro.custom.resolver.activity");
+            if (TextUtils.isEmpty(customResolverActivity)) {
+                customResolverActivity = Resources.getSystem().getString(
+                        R.string.config_customResolverActivity);
+            }
             if (TextUtils.isEmpty(customResolverActivity)) {
                 customResolverActivity = null;
             } else {
@@ -3594,7 +3596,7 @@ public class PackageManagerService extends IPackageManager.Stub {
     private boolean shouldIncludeResolveActivity(Intent intent) {
         synchronized(mPackages) {
             AppSuggestManager suggest = AppSuggestManager.getInstance(mContext);
-            return (suggest != null) ? suggest.handles(intent) : false;
+            return mResolverReplaced && (suggest != null) ? suggest.handles(intent) : false;
         }
     }
 
