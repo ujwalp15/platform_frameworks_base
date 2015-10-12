@@ -266,6 +266,11 @@ public interface MetricsConstants {
     // Notification drawer settings
     public static final int NOTIFICATION_DRAWER_SETTINGS = 247;
 
+    // QS Tiles
+    public static final int QS_BRIGHTNESS = 239;
+    public static final int QS_SCREEN_OFF = 240;
+    public static final int QS_SCREENSHOT = 241;
+
     // These constants must match those in the analytic pipeline, do not edit.
     // Add temporary values to the top of MetricsLogger instead.
 
