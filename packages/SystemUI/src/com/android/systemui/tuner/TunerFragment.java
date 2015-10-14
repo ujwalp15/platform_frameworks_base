@@ -47,8 +47,6 @@ public class TunerFragment extends PreferenceFragment {
 
     private static final String WARNING_TAG = "tuner_warning";
 
-    private static final int MENU_REMOVE = Menu.FIRST + 1;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,23 +88,10 @@ public class TunerFragment extends PreferenceFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.add(Menu.NONE, MENU_REMOVE, Menu.NONE, R.string.remove_from_settings);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 getActivity().finish();
-                return true;
-            case MENU_REMOVE:
-                TunerService.showResetRequest(getContext(), new Runnable() {
-                    @Override
-                    public void run() {
-                        getActivity().finish();
-                    }
-                });
                 return true;
         }
         return super.onOptionsItemSelected(item);
