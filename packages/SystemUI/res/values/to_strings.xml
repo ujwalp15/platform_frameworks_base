@@ -25,4 +25,6 @@
     <string name="systemui_tuner_statusbar_title">Statusbar Items</string>
     <string name="systemui_tuner_qs_title">Quick Settings</string>
 
+    <string name="quick_settings_tentacles_label">Tentacles</string>
+
 </resources>
