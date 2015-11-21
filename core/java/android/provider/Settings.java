@@ -3295,6 +3295,17 @@ public final class Settings {
         public static final String ANIMATOR_DURATION_SCALE = Global.ANIMATOR_DURATION_SCALE;
 
         /**
+         * Control whether the accelerometer will be used to change screen
+         * orientation.  If 0, it will not be used unless explicitly requested
+         * by the application; if 1, it will be used by default unless explicitly
+         * disabled by the application.
+         */
+        public static final String ACCELEROMETER_ROTATION = "accelerometer_rotation";
+
+        /** @hide */
+        public static final Validator ACCELEROMETER_ROTATION_VALIDATOR = sBooleanValidator;
+
+        /**
          * Control the type of rotation which can be performed using the accelerometer
          * if ACCELEROMETER_ROTATION is enabled.
          * Value is a bitwise combination of
@@ -3306,17 +3317,6 @@ public final class Settings {
          * @hide
          */
         public static final String ACCELEROMETER_ROTATION_ANGLES = "accelerometer_rotation_angles";
-
-        /**
-         * Control whether the accelerometer will be used to change screen
-         * orientation.  If 0, it will not be used unless explicitly requested
-         * by the application; if 1, it will be used by default unless explicitly
-         * disabled by the application.
-         */
-        public static final String ACCELEROMETER_ROTATION = "accelerometer_rotation";
-
-        /** @hide */
-        public static final Validator ACCELEROMETER_ROTATION_VALIDATOR = sBooleanValidator;
 
         /**
          * Default screen rotation when no other policy applies.
@@ -3918,7 +3918,7 @@ public final class Settings {
          * Disable dashboard suggestions in settings
          * @hide
          */
-        ​public static final String DISABLE_SUGGESTIONS = "disable_suggestions";
+        public static final String DISABLE_SUGGESTIONS = "disable_suggestions";
 
         /**
          * Dashboard portrait columns in settings
