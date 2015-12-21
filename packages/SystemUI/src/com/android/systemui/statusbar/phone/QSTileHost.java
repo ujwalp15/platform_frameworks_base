@@ -59,6 +59,7 @@ import com.android.systemui.qs.tiles.ProfilesTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
 import com.android.systemui.qs.tiles.ScreenTimeoutTile;
 import com.android.systemui.qs.tiles.SyncTile;
+import com.android.systemui.qs.tiles.TentaclesTile;
 import com.android.systemui.qs.tiles.UsbTetherTile;
 import com.android.systemui.qs.tiles.VolumeTile;
 import com.android.systemui.qs.tiles.WifiTile;
@@ -358,6 +359,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (tileSpec.equals("lockscreen")) return  new LockscreenToggleTile(this);
         else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(this);
         else if (tileSpec.equals("live_display")) return new LiveDisplayTile(this);
+        else if (tileSpec.equals("tentacles")) return new TentaclesTile(this);
         else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
         else throw new IllegalArgumentException("Bad tile spec: " + tileSpec);
     }
@@ -440,6 +442,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("lockscreen")) return R.string.quick_settings_lockscreen_label;
         else if (spec.equals("ambient_display")) return R.string.quick_settings_ambient_display_label;
         else if (spec.equals("live_display")) return R.string.live_display_title;
+        else if (spec.equals("tentacles")) return R.string.quick_settings_tentacles_label;
         return 0;
     }
 
