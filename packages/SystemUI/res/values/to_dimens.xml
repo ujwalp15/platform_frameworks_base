@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2014 The Dirty Unicorns Project
+<!--
+     Copyright (C) 2016 Benzo Rom
  
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,7 +14,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+<resources>
+    <!-- Network traffic monitor single-line text size -->
+    <dimen name="net_traffic_single_text_size">12dp</dimen>
+    <!-- Network traffic monitor multi-line text size -->
+    <dimen name="net_traffic_multi_text_size">9dp</dimen>
  
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_lock_power_screenrecord_alpha"
-    android:tint="?attr/colorControlNormal" />
+</resources>
