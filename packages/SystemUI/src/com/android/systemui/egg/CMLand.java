@@ -38,6 +38,6 @@ public class CMLand extends MLand {
 
     @Override
     protected int getEggPlayer() {
-        return R.drawable.cid;
+        return R.drawable.android;
     }
 }

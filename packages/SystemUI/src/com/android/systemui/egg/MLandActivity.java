@@ -32,8 +32,8 @@ public class MLandActivity extends Activity {
         super.onCreate(savedInstanceState);
         final boolean isCM = getIntent().getBooleanExtra("is_cm", false);
         if (isCM) {
-            setContentView(R.layout.cmland);
-            mLand = (CMLand) findViewById(R.id.world);
+            setContentView(R.layout.mland);
+            mLand = (MLand) findViewById(R.id.world);
         } else {
             setContentView(R.layout.mland);
             mLand = (MLand) findViewById(R.id.world);
