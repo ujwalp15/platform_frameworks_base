@@ -25,6 +25,8 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
 
+import org.cyanogenmod.internal.logging.CMMetricsLogger;
+
 /**
  * Tentacles quick settings tile
  */
@@ -62,7 +64,7 @@ public class TentaclesTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsLogger.DONT_TRACK_ME_BRO;
+        return CMMetricsLogger.DONT_LOG;
     }
 
     @Override
