@@ -3525,10 +3525,15 @@ public final class Settings {
         public static final String RECENTS_CLEAR_ALL_LOCATION = "recents_clear_all_location";
 
         /**
-         * Whether to display recents in full screen
+         * Immersive recents options
+         *
+         * 0 = Default AOSP look
+         * 1 = Statusbar only
+         * 2 = Navbar only
+         * 3 = Fullscreen
          * @hide
          */
-        public static final String RECENTS_FULL_SCREEN = "recents_full_screen";
+        public static final String IMMERSIVE_RECENTS = "immersive_recents";
 
          /**
          * Whether wifi settings will connect to access point automatically
