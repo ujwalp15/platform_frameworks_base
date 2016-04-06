@@ -77,6 +77,7 @@ public class LiveLockScreenController {
                     }
                 }
                 if (mLiveLockScreenView != null && !mLiveLockScreenView.isAttachedToWindow()) {
+                    mBar.updateRowStates();
                     mPanelView.addView(mLiveLockScreenView, 0);
                 }
             }
@@ -162,7 +163,7 @@ public class LiveLockScreenController {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mBar.focusKeyguardExternalView();
+                        mPanelView.slideLockScreenOut();
                     }
                 });
             }
@@ -173,6 +174,18 @@ public class LiveLockScreenController {
             mLiveLockScreenView.unregisterKeyguardExternalViewCallback(
                     mExternalKeyguardViewCallbacks);
             mLiveLockScreenView = null;
+        }
+
+        @Override
+        public void slideLockscreenIn() {
+            if (mPanelView.mShowingExternalKeyguard) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBar.showKeyguard();
+                    }
+                });
+            }
         }
     };
 
