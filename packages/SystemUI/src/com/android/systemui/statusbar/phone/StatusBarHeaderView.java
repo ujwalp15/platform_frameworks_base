@@ -19,7 +19,6 @@ package com.android.systemui.statusbar.phone;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -85,7 +84,7 @@ import org.cyanogenmod.internal.logging.CMMetricsLogger;
 /**
  * The view to manage the header area in the expanded status bar.
  */
-public class StatusBarHeaderView extends RelativeLayout implements View.OnClickListener, View.OnLongClickListener,
+public class StatusBarHeaderView extends RelativeLayout implements View.OnClickListener,
         NextAlarmController.NextAlarmChangeCallback, WeatherController.Callback, 
         StatusBarHeaderMachine.IStatusBarHeaderMachineObserver, EmergencyListener {
 
@@ -210,7 +209,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         mSystemIcons = (LinearLayout) findViewById(R.id.system_icons);
         mWeatherContainer = (LinearLayout) findViewById(R.id.weather_container);
         mWeatherContainer.setOnClickListener(this);
-        mWeatherContainer.setOnLongClickListener(this);
         mWeatherLine1 = (TextView) findViewById(R.id.weather_line_1);
         mWeatherLine2 = (TextView) findViewById(R.id.weather_line_2);
         mEditTileDoneText = (TextView) findViewById(R.id.done);
@@ -527,7 +525,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
     public void onWeatherChanged(WeatherController.WeatherInfo info) {
         if (info.temp == null || info.condition == null) {
             mWeatherLine1.setText(mContext.getString(R.string.weather_info_not_available));
-            mWeatherLine2.setText(mContext.getString(R.string.weather_info_not_available2));
+            mWeatherLine2.setText(null);
         } else {
             mWeatherLine1.setText(mContext.getString(
                     R.string.status_bar_expanded_header_weather_format,
@@ -659,14 +657,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         }
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-        if (v == mWeatherContainer) {
-            openLockClockWeatherActivity();
-        }
-        return true;
-    }
-
     private void startSettingsActivity() {
         mActivityStarter.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS),
                 true /* dismissShade */);
@@ -694,13 +684,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setComponent(WeatherControllerImpl.COMPONENT_WEATHER_FORECAST);
-        mActivityStarter.startActivity(intent, true /* dismissShade */);
-    }
-
-    private void openLockClockWeatherActivity() {
-        Intent intent = new Intent().setComponent(new ComponentName(
-            "com.cyanogenmod.lockclock", "com.cyanogenmod.lockclock.preference.Preferences"));
-        intent.putExtra(":android:show_fragment", "com.cyanogenmod.lockclock.preference.WeatherPreferences");
         mActivityStarter.startActivity(intent, true /* dismissShade */);
     }
 
@@ -1110,7 +1093,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 
             mShowBatteryTextExpanded = showExpandedBatteryPercentage;
             mShowWeather = CMSettings.System.getInt(
-                    resolver, CMSettings.System.STATUS_BAR_SHOW_WEATHER, 0) == 1;
+                    resolver, CMSettings.System.STATUS_BAR_SHOW_WEATHER, 1) == 1;
             updateVisibilities();
             requestCaptureValues();
         }
