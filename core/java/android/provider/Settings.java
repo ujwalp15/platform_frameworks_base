@@ -3822,8 +3822,6 @@ public final class Settings {
         public static final String STATUSBAR_BATTERY_BAR_ANIMATE = "statusbar_battery_bar_animate";
 
         /**
-=======
->>>>>>> parent of 39bdfb8... Lockscreen Weather (1,2)
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
