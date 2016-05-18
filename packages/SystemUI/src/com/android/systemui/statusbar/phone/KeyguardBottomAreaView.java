@@ -72,6 +72,8 @@ import com.android.systemui.statusbar.policy.AccessibilityController;
 import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 
+import java.util.Objects;
+
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
 
@@ -131,6 +133,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private final WindowManager.LayoutParams mWindowLayoutParams;
     private OnInterceptTouchEventListener mInterceptTouchListener;
     private BroadcastReceiver mDevicePolicyReceiver;
+    private Intent mLastCameraIntent;
 
     private final ServiceConnection mPrewarmConnection = new ServiceConnection() {
 
@@ -147,14 +150,12 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     @Override
     public void setVisibility(int visibility) {
-        if (visibility != getVisibility()) {
-            if (visibility == View.VISIBLE) {
-                if (!mBottomAreaAttached) {
-                    addKeyguardBottomArea(false);
-                }
-            } else if (mBottomAreaAttached) {
-                removeKeyguardBottomArea();
+        if (visibility == View.VISIBLE) {
+            if (!mBottomAreaAttached) {
+                addKeyguardBottomArea(false);
             }
+        } else if (mBottomAreaAttached) {
+            removeKeyguardBottomArea();
         }
         super.setVisibility(visibility);
     }
@@ -723,9 +724,18 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
             mPreviewContainer.removeView(mCameraPreview);
         } else {
-            mCameraPreview = mPreviewInflater.inflatePreview(getCameraIntent());
+            Intent cameraIntent = getCameraIntent();
+            if (!Objects.equals(cameraIntent, mLastCameraIntent)) {
+                if (mCameraPreview != null) {
+                    mPreviewContainer.removeView(mCameraPreview);
+                }
+                mCameraPreview = mPreviewInflater.inflatePreview(cameraIntent);
+                if (mCameraPreview != null) {
+                    mPreviewContainer.addView(mCameraPreview);
+                }
+            }
+            mLastCameraIntent = cameraIntent;
             if (mCameraPreview != null) {
-                mPreviewContainer.addView(mCameraPreview);
                 mCameraPreview.setVisibility(View.GONE);
             }
         }
@@ -779,6 +789,10 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 .setInterpolator(mLinearOutSlowInInterpolator)
                 .setStartDelay(delay)
                 .setDuration(DOZE_ANIMATION_ELEMENT_DURATION);
+    }
+
+    public void cleanup() {
+        removeKeyguardBottomArea();
     }
 
     private final class DevicePolicyBroadcastReceiver extends BroadcastReceiver {
