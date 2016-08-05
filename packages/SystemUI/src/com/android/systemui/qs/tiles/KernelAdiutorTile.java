@@ -32,7 +32,7 @@ import org.cyanogenmod.internal.logging.CMMetricsLogger;
 public class KernelAdiutorTile extends QSTile<QSTile.BooleanState> {
 
     private static final Intent KERNEL_ADIUTOR = new Intent().setComponent(new ComponentName(
-            "com.grarak.kerneladiutor", "com.grarak.kerneladiutor.activities.MainActivity"));
+            "com.kerneladiutor.mod", "com.grarak.kerneladiutor.MainActivity"));
 
     public KernelAdiutorTile(Host host) {
         super(host);
