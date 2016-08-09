@@ -53,8 +53,10 @@ public class TunerFragment extends PreferenceFragment {
     private static final int MENU_REMOVE = Menu.FIRST + 1;
 
     private static final String SHOW_LTE_FOURGEE = "show_lte_fourgee";
+    private static final String BLUETOOTH_SHOW_BATTERY = "bluetooth_show_battery";
 
     private SwitchPreference mShowLteFourGee;
+    private SwitchPreference mBluetoothBattery;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,10 @@ public class TunerFragment extends PreferenceFragment {
         }
 
         setHasOptionsMenu(true);
+
+        mBluetoothBattery = (SwitchPreference) findPreference(BLUETOOTH_SHOW_BATTERY);
+        mBluetoothBattery.setChecked((Settings.System.getInt(resolver,
+                Settings.System.BLUETOOTH_SHOW_BATTERY, 0) == 1));
     }
 
     @Override
@@ -114,6 +120,11 @@ public class TunerFragment extends PreferenceFragment {
             boolean checked = ((SwitchPreference)preference).isChecked();
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.SHOW_LTE_FOURGEE, checked ? 1:0);
+            return true;
+        } else if  (preference == mBluetoothBattery) {
+            boolean checked = ((SwitchPreference)preference).isChecked();
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.BLUETOOTH_SHOW_BATTERY, checked ? 1:0);
             return true;
         }
         return super.onPreferenceTreeClick(preference);
