@@ -2222,6 +2222,9 @@ message MetricsEvent {
     // END OF AOSP CONSTANTS
 
     // Tentacles
-    TENTACLES = 496;
+    TENTACLES = 411;
+
+    // Quick setting tiles
+    QUICK_SETTINGS = 412;
   }
 }
