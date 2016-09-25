@@ -2223,5 +2223,8 @@ message MetricsEvent {
 
     // Tentacles
     TENTACLES = 411;
+
+    // Quick setting tiles
+    QUICK_SETTINGS = 412;
   }
 }
