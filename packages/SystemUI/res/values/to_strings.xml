@@ -69,5 +69,6 @@
     <string name="accessibility_quick_settings_caffeine_off">Caffeine off</string>
     <string name="accessibility_quick_settings_caffeine_on">Caffeine on</string>
     <string name="quick_settings_tentacles_label">Tentacles</string>
+    <string name="quick_settings_kernel_adiutor_label">Kernel Adiutor-Mod</string>
 
 </resources>
