@@ -100,12 +100,12 @@
 
     <!-- The default tiles to display in QuickSettings -->
     <string name="quick_settings_tiles_default" translatable="false">
-        wifi,cell,battery,dnd,flashlight,rotation,bt,airplane,location
+        wifi,cell,tentacles,dnd,flashlight,rotation,bt,airplane,location
     </string>
 
     <!-- The default tiles to display in QuickSettings -->
     <string name="quick_settings_tiles_extra" translatable="false">
-        hotspot,inversion,saver,work,cast,screenshot,adb_network,sync,expanded_desktop,reboot,usb_tether,music,ime,caffeine
+        hotspot,inversion,saver,work,cast,screenshot,adb_network,sync,expanded_desktop,reboot,usb_tether,music,ime,caffeine,battery
     </string>
 
     <!-- The tiles to display in QuickSettings -->
