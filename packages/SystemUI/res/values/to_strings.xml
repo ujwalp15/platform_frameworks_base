@@ -69,5 +69,6 @@
     <string name="quick_settings_music_pause">Pause</string>
     <string name="quick_settings_ime_label">IME</string>
     <string name="quick_settings_tentacles_label">Tentacles</string>
+    <string name="quick_settings_kernel_adiutor_label">Kernel Adiutor-Mod</string>
 
 </resources>
