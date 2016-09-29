@@ -3774,7 +3774,7 @@ public final class Settings {
          * 2 - Enabled (screen is rotated by 180 or 270 degrees: tablet)
          * @hide
          */
-         public static final String SWAP_VOLUME_BUTTONS = "swap_volume_buttons";
+        public static final String SWAP_VOLUME_BUTTONS = "swap_volume_buttons";
 
         /**
          * Toast icon
@@ -3782,13 +3782,13 @@ public final class Settings {
          */
         public static final String TOAST_ICON = "toast_icon";
 
-       /**
-        * MediaScanner behavior on boot.
-        * 0 = enabled
-        * 1 = ask (notification)
-        * 2 = disabled
-        * @hide
-        */
+        /**
+         * MediaScanner behavior on boot.
+         * 0 = enabled
+         * 1 = ask (notification)
+         * 2 = disabled
+         * @hide
+         */
         public static final String MEDIA_SCANNER_ON_BOOT = "media_scanner_on_boot";
 
         /**
@@ -3818,6 +3818,13 @@ public final class Settings {
          * @hide
          */
         public static final String SHOW_ALARM_FULLSCREEN = "show_alarm_fullscreen";
+
+        /**
+         * Whether to vibrate when quick settings tile is pressed.
+         *
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_TILES_VIBRATE = "quick_settings_vibrate";
 
         /**
          * Show or hide clock
