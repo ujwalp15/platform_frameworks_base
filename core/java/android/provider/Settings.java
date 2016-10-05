@@ -1,4 +1,4 @@
-<<</*
+/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -6634,11 +6634,8 @@ public final class Settings {
             ENHANCED_VOICE_PRIVACY_ENABLED,
             TTY_MODE_ENABLED,
             INCALL_POWER_BUTTON_BEHAVIOR,
-<<<<<<< HEAD
-            ADVANCED_REBOOT
-=======
+            ADVANCED_REBOOT,
             QS_TILES,
->>>>>>> android-7.0.0_r14
         };
 
         /**
