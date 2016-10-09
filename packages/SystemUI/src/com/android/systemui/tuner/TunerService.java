@@ -52,12 +52,6 @@ import java.util.Set;
 
 public class TunerService extends SystemUI {
 
-    public static final String ACTION_CLEAR = "com.android.systemui.action.CLEAR_TUNER";
-
-    private static final String TUNER_VERSION = "sysui_tuner_version";
-
-    private static final int CURRENT_TUNER_VERSION = 1;
-
     private final Observer mObserver = new Observer();
     // Map of Uris we listen on to their settings keys.
     private final ArrayMap<Uri, String> mListeningUris = new ArrayMap<>();
@@ -72,12 +66,6 @@ public class TunerService extends SystemUI {
     public void start() {
         mContentResolver = mContext.getContentResolver();
 
-        for (UserInfo user : UserManager.get(mContext).getUsers()) {
-            mCurrentUser = user.getUserHandle().getIdentifier();
-            if (getValue(TUNER_VERSION, 0) != CURRENT_TUNER_VERSION) {
-                upgradeTuner(getValue(TUNER_VERSION, 0), CURRENT_TUNER_VERSION);
-            }
-        }
         putComponent(TunerService.class, this);
 
         mCurrentUser = ActivityManager.getCurrentUser();
@@ -90,24 +78,6 @@ public class TunerService extends SystemUI {
             }
         };
         mUserTracker.startTracking();
-    }
-
-    private void upgradeTuner(int oldVersion, int newVersion) {
-        if (oldVersion < 1) {
-            String blacklistStr = getValue(StatusBarIconController.ICON_BLACKLIST);
-            if (blacklistStr != null) {
-                ArraySet<String> iconBlacklist =
-                        StatusBarIconController.getIconBlacklist(blacklistStr);
-
-                iconBlacklist.add("rotate");
-                iconBlacklist.add("headset");
-
-                Settings.Secure.putStringForUser(mContentResolver,
-                        StatusBarIconController.ICON_BLACKLIST,
-                        TextUtils.join(",", iconBlacklist), mCurrentUser);
-            }
-        }
-        setValue(TUNER_VERSION, newVersion);
     }
 
     public String getValue(String setting) {
@@ -182,19 +152,6 @@ public class TunerService extends SystemUI {
             for (Tunable tunable : mTunableLookup.get(key)) {
                 tunable.onTuningChanged(key, value);
             }
-        }
-    }
-
-    public void clearAll() {
-        // A couple special cases.
-        Settings.Global.putString(mContentResolver, DemoMode.DEMO_MODE_ALLOWED, null);
-        Settings.System.putString(mContentResolver, BatteryMeterDrawable.SHOW_PERCENT_SETTING, null);
-        Intent intent = new Intent(DemoMode.ACTION_DEMO);
-        intent.putExtra(DemoMode.EXTRA_COMMAND, DemoMode.COMMAND_EXIT);
-        mContext.sendBroadcast(intent);
-
-        for (String key : mTunableLookup.keySet()) {
-            Settings.Secure.putString(mContentResolver, key, null);
         }
     }
 
@@ -287,14 +244,5 @@ public class TunerService extends SystemUI {
 
     public interface Tunable {
         void onTuningChanged(String key, String newValue);
-    }
-
-    public static class ClearReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ACTION_CLEAR.equals(intent.getAction())) {
-                get(context).clearAll();
-            }
-        }
     }
 }

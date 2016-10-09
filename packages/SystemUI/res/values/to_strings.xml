@@ -41,6 +41,9 @@
     <!-- Screenshot Delete Toast -->
     <string name="delete_screenshot_toast">Screenshot deleted</string>
 
+    <!-- SystemUI Tuner Parts -->
+    <string name="systemui_tuner_nightmode_title">Night mode</string>
+
     <!-- Quick Settings tiles -->
     <string name="quick_settings_screenshot_label">Screenshot</string>
     <string name="quick_settings_adb_network">ADB network</string>
