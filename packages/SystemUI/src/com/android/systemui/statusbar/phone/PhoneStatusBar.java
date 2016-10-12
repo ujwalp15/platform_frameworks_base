@@ -531,6 +531,15 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAV_BAR_DYNAMIC),
                     false, this, UserHandle.USER_ALL);
+           resolver.registerContentObserver(Settings.Secure.getUriFor(
+                   Settings.Secure.QS_ROWS_PORTRAIT),
+                   false, this, UserHandle.USER_ALL);
+           resolver.registerContentObserver(Settings.Secure.getUriFor(
+                   Settings.Secure.QS_ROWS_LANDSCAPE),
+                   false, this, UserHandle.USER_ALL);
+           resolver.registerContentObserver(Settings.Secure.getUriFor(
+                   Settings.Secure.QS_COLUMNS),
+                   false, this, UserHandle.USER_ALL);
            updateSettings();
         }
 
@@ -540,6 +549,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (uri.equals(Settings.System.getUriFor(
                       Settings.System.NAV_BAR_DYNAMIC))) {
                       mNavigationController.updateNavbarOverlay(mContext.getResources());
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.QS_ROWS_PORTRAIT))
+                    || uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.QS_ROWS_LANDSCAPE))) {
+                    updateResources();
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.QS_COLUMNS))) {
+                    updateResources();
             }
             updateSettings();
         }
@@ -835,13 +852,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         addNavigationBar();
 
+        TunerService.get(mContext).addTunable(this,
+                SCREEN_BRIGHTNESS_MODE,
+                STATUS_BAR_BRIGHTNESS_CONTROL);
+
         if (mSettingsObserver == null) {
             mSettingsObserver = new SettingsObserver(new Handler());
         }
         mSettingsObserver.observe();
-        TunerService.get(mContext).addTunable(this,
-                SCREEN_BRIGHTNESS_MODE,
-                STATUS_BAR_BRIGHTNESS_CONTROL);
 
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController, mCastController,
