@@ -58,7 +58,7 @@ public class TentaclesTile extends QSTile<QSTile.BooleanState> {
     /*    To Do: Use long click to open ABOUT_OCTOS after AboutOctOS is installed */
     /*    For now default to TENTACLES_SETTINGS */
     /*    return ABOUT_OCTOS; */
-        return TENTACLES_SETTINGS;
+        return ABOUT_OCTOS;
     }
 
     @Override
