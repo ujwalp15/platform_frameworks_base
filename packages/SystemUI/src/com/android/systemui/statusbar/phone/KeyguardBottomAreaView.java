@@ -221,6 +221,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mShortcutHelper = new LockscreenShortcutsHelper(mContext, this);
         watchForCameraPolicyChanges();
         updateCameraVisibility();
+        updateLeftButtonVisibility();
         mUnlockMethodCache = UnlockMethodCache.getInstance(getContext());
         mUnlockMethodCache.addListener(this);
         mLockIcon.update();
@@ -257,6 +258,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mCameraImageView.setContentDescription(contentDescription);
         mCameraImageView.setDefaultFilter(shouldGrayScale ? mGrayScaleFilter : null);
         updateCameraVisibility();
+        updateLeftButtonVisibility();
     }
 
     private void initAccessibility() {
@@ -317,6 +319,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void setPhoneStatusBar(PhoneStatusBar phoneStatusBar) {
         mPhoneStatusBar = phoneStatusBar;
         updateCameraVisibility(); // in case onFinishInflate() was called too early
+        updateLeftButtonVisibility();
     }
 
     public void setAffordanceHelper(KeyguardAffordanceHelper affordanceHelper) {
@@ -326,6 +329,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void setUserSetupComplete(boolean userSetupComplete) {
         mUserSetupComplete = userSetupComplete;
         updateCameraVisibility();
+        updateLeftButtonVisibility();
         updateLeftAffordanceIcon();
     }
 
@@ -346,6 +350,21 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 KeyguardUpdateMonitor.getCurrentUser());
     }
 
+    private void updateLeftButtonVisibility() {
+        if (mLeftAffordanceView == null) {
+            return;
+        }
+        boolean visible = mUserSetupComplete;
+        if (visible) {
+            if (isTargetCustom(Shortcuts.LEFT_SHORTCUT)) {
+                visible = !mShortcutHelper.isTargetEmpty(Shortcuts.LEFT_SHORTCUT);
+            }
+        }
+        if (mLeftAffordanceView != null) {
+            mLeftAffordanceView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
     private void updateCameraVisibility() {
         if (mCameraImageView == null) {
             // Things are not set up yet; reply hazy, ask again later
@@ -361,7 +380,9 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                         && getResources().getBoolean(R.bool.config_keyguardShowCameraAffordance);
             }
         }
-        mCameraImageView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (mCameraImageView != null) {
+            mCameraImageView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void updateLeftAffordanceIcon() {
@@ -386,6 +407,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mLeftAffordanceView.setImageDrawable(drawable);
         mLeftAffordanceView.setContentDescription(contentDescription);
         mLeftAffordanceView.setDefaultFilter(shouldGrayScale ? mGrayScaleFilter : null);
+        updateLeftButtonVisibility();
     }
 
     public boolean isLeftVoiceAssist() {
@@ -626,6 +648,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (changedView == this && visibility == VISIBLE) {
             mLockIcon.update();
             updateCameraVisibility();
+            updateLeftButtonVisibility();
         }
     }
 
@@ -662,6 +685,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     public void onUnlockMethodStateChanged() {
         mLockIcon.update();
         updateCameraVisibility();
+        updateLeftButtonVisibility();
     }
 
     private void inflateCameraPreview() {
@@ -745,6 +769,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 @Override
                 public void run() {
                     updateCameraVisibility();
+                    updateLeftButtonVisibility();
                 }
             });
         }
@@ -755,6 +780,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         @Override
         public void onUserSwitchComplete(int userId) {
             updateCameraVisibility();
+            updateLeftButtonVisibility();
         }
 
         @Override
