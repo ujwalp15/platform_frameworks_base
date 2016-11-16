@@ -3832,6 +3832,12 @@ public final class Settings {
         public static final String SCREENSHOT_DELAY = "screenshot_delay";
 
         /**
+         * Quick Settings number of columns
+         * @hide
+         */
+        public static final String QS_LAYOUT_COLUMNS = "qs_layout_columns";
+
+        /**
          * Network traffic indicator, goes from least to greatest significant bitwise
          * 0 = Display up-stream traffic if set
          * 1 = Display down-stream traffic if set
@@ -7035,27 +7041,6 @@ public final class Settings {
                 "system_navigation_keys_enabled";
 
         /**
-         * Number of rows used for the Quick Settings (portrait)
-         *
-         * @hide
-         */
-        public static final String QS_ROWS_PORTRAIT = "qs_rows_portrait";
-
-        /**
-         * Number of rows used for the Quick Settings (landscape)
-         *
-         * @hide
-         */
-        public static final String QS_ROWS_LANDSCAPE = "qs_rows_landscape";
-
-        /**
-         * Number of columns used for the Quick Settings
-         *
-         * @hide
-         */
-        public static final String QS_COLUMNS = "qs_columns";
-
-        /**
          * Holds comma separated list of ordering of QS tiles.
          * @hide
          */
@@ -7092,12 +7077,6 @@ public final class Settings {
          * @hide
          */
         public static final String QS_DATA_ADVANCED = "qs_data_advanced";
-
-        /**
-         * Count of small QS tiles.
-         * @hide
-         */
-        public static final String QQS_COUNT = "sysui_qqs_count";
 
         /**
          * This are the settings to be backed up.
