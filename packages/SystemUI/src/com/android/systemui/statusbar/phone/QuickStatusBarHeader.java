@@ -469,7 +469,14 @@ public class QuickStatusBarHeader extends BaseStatusBarHeader implements
                 public void run() {
                     setQsPanelOffset();
                 }
-            });}
+            });
+            if (mQsPanel != null) {
+                mQsPanel.updateSettings();
+            }
+            if (mHeaderQsPanel != null) {
+                mHeaderQsPanel.updateSettings();
+            }
+    }
 
     @Override
     public void updateHeader(final Drawable headerImage, final boolean force) {
