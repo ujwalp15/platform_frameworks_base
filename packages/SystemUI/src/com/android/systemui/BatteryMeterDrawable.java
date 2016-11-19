@@ -54,7 +54,7 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private static final float ASPECT_RATIO = 9.5f / 14.5f;
     public static final String TAG = BatteryMeterDrawable.class.getSimpleName();
-    private static final String STATUS_BAR_SHOW_BATTERY_PERCENT =
+    public static final String STATUS_BAR_SHOW_BATTERY_PERCENT =
             Settings.Secure.STATUS_BAR_SHOW_BATTERY_PERCENT;
 
     private static final boolean SINGLE_DIGIT_PERCENT = false;
