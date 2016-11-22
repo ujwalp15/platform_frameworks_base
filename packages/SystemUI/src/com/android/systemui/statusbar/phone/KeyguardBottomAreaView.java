@@ -697,12 +697,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
             mPreviewContainer.removeView(mCameraPreview);
         } else {
-        View previewBefore = mCameraPreview;
-        boolean visibleBefore = false;
-        if (previewBefore != null) {
-            mPreviewContainer.removeView(previewBefore);
-            visibleBefore = previewBefore.getVisibility() == View.VISIBLE;
-        }
             Intent cameraIntent = getCameraIntent();
             if (!Objects.equals(cameraIntent, mLastCameraIntent)) {
                 if (mCameraPreview != null) {
@@ -714,8 +708,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 }
             }
             mLastCameraIntent = cameraIntent;
-        if (mCameraPreview != null) {
-            mCameraPreview.setVisibility(visibleBefore ? View.VISIBLE : View.INVISIBLE);
+            if (mCameraPreview != null) {
+                mCameraPreview.setVisibility(View.INVISIBLE);
             }
         }
         if (mAffordanceHelper != null) {
