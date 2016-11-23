@@ -83,4 +83,7 @@
     <string name="screenshot_abort_title">No screenshot taken</string>
     <string name="screenshot_abort_text">Operation aborted</string>
 
+    <!-- UI tuner -->
+    <string name="statusbar_tuner_category_title">Hide items from statusbar</string>
+
 </resources>
