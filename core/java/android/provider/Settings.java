@@ -6899,9 +6899,15 @@ public final class Settings {
         public static final String STATUS_BAR_BATTERY_STYLE = "status_bar_battery_style";
 
         /**
-         * Control whether Night display is currently activated.
+         * Whether to sync the battery tile stile with the statusbar battery icon style
          * @hide
          */
+        public static final String STATUS_BAR_BATTERY_STYLE_TILE = "status_bar_battery_style_tile";
+
+        /**
+         * Control whether Night display is currently activated.
+         * @hide
+         */        
         public static final String NIGHT_DISPLAY_ACTIVATED = "night_display_activated";
 
         /**
@@ -7149,7 +7155,8 @@ public final class Settings {
             ADVANCED_REBOOT,
             QS_TILES,
             STATUS_BAR_SHOW_BATTERY_PERCENT,
-            STATUS_BAR_BATTERY_STYLE
+            STATUS_BAR_BATTERY_STYLE,
+            STATUS_BAR_BATTERY_STYLE_TILE
         };
 
         /**
