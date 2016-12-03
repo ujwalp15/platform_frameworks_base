@@ -52,8 +52,10 @@ public class TunerFragment extends PreferenceFragment {
     private static final int MENU_REMOVE = Menu.FIRST + 1;
 
     private static final String BLUETOOTH_SHOW_BATTERY = "bluetooth_show_battery";
+    private static final String DATA_WIFI_ACTIVITY_ARROWS = "data_activity_arrows";
 
     private SwitchPreference mBluetoothBattery;
+    private SwitchPreference mDataWifiActivityArrows;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,10 @@ public class TunerFragment extends PreferenceFragment {
         mBluetoothBattery = (SwitchPreference) findPreference(BLUETOOTH_SHOW_BATTERY);
         mBluetoothBattery.setChecked((Settings.System.getInt(resolver,
                 Settings.System.BLUETOOTH_SHOW_BATTERY, 0) == 1));
+
+        mDataWifiActivityArrows = (SwitchPreference) findPreference(DATA_WIFI_ACTIVITY_ARROWS);
+        mDataWifiActivityArrows.setChecked((Settings.System.getInt(resolver,
+                Settings.System.DATA_ACTIVITY_ARROWS, 0) == 1));
     }
 
     @Override
@@ -109,6 +115,11 @@ public class TunerFragment extends PreferenceFragment {
             boolean checked = ((SwitchPreference)preference).isChecked();
             Settings.System.putInt(getActivity().getContentResolver(),
                     Settings.System.BLUETOOTH_SHOW_BATTERY, checked ? 1:0);
+            return true;
+        } else if  (preference == mDataWifiActivityArrows) {
+            boolean checked = ((SwitchPreference)preference).isChecked();
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.DATA_ACTIVITY_ARROWS, checked ? 1:0);
             return true;
         }
         return super.onPreferenceTreeClick(preference);
