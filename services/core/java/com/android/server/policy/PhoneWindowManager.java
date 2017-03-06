@@ -272,6 +272,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_SLEEP = 7;
     private static final int KEY_ACTION_LAST_APP = 8;
     private static final int KEY_ACTION_SPLIT_SCREEN = 9;
+    private static final int KEY_ACTION_SINGLE_HAND_LEFT = 10;
+    private static final int KEY_ACTION_SINGLE_HAND_RIGHT = 11;
 
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
@@ -879,6 +881,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private String mRearFlashCameraId;
     private boolean mTorchLongPressPowerEnabled;
     private boolean mTorchEnabled;
+
+    int mDesiredRotation = -1;
 
     private class PolicyHandler extends Handler {
         @Override
@@ -1846,6 +1850,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_SPLIT_SCREEN:
                 toggleSplitScreen();
+                break;
+            case KEY_ACTION_SINGLE_HAND_LEFT:
+                toggleSingleHand(mContext, true);
+                break;
+            case KEY_ACTION_SINGLE_HAND_RIGHT:
+                toggleSingleHand(mContext, false);
                 break;
             default:
                 break;
@@ -7052,6 +7062,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     /** {@inheritDoc} */
     @Override
     public int interceptMotionBeforeQueueingNonInteractive(long whenNanos, int policyFlags) {
+        if ((WindowManagerPolicy.POLICY_FLAG_REMOVE_HANDYMODE & policyFlags) !=0) {
+            Slog.i(TAG, "interceptMotionBeforeQueueingNonInteractive policyFlags: "+policyFlags);
+            Settings.Global.putString(mContext.getContentResolver(),
+                Settings.Global.SINGLE_HAND_MODE, "");
+            return 0;
+        }
         if ((policyFlags & FLAG_WAKE) != 0) {
             if (wakeUp(whenNanos / 1000000, mAllowTheaterModeWakeFromMotion,
                     "android.policy:MOTION")) {
@@ -7344,9 +7360,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
+    class OverscanTimeout implements Runnable {
+        @Override
+        public void run() {
+            Slog.i(TAG, "OverscanTimeout run");
+            Settings.Global.putString(mContext.getContentResolver(), Settings.Global.SINGLE_HAND_MODE, "");
+        }
+    }
+    OverscanTimeout mOverscanTimeout = new OverscanTimeout();
+
     // Called on the PowerManager's Notifier thread.
     @Override
     public void finishedGoingToSleep(int why) {
+        mHandler.removeCallbacks(mOverscanTimeout);
+        mHandler.postDelayed(mOverscanTimeout, 200);
         EventLog.writeEvent(70000, 0);
         if (DEBUG_WAKEUP) Slog.i(TAG, "Finished going to sleep... (why=" + why + ")");
         MetricsLogger.histogram(mContext, "screen_timeout", mLockScreenTimeout / 1000);
@@ -7747,6 +7774,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             final int preferredRotation;
+            if (mDesiredRotation >= 0) {
+                preferredRotation = mDesiredRotation;
+                Slog.i(TAG, "mDesiredRotation:" + mDesiredRotation);
+                return preferredRotation;
+            }
             if (mLidState == LID_OPEN && mLidOpenRotation >= 0) {
                 // Ignore sensor when lid switch is open and rotation is forced.
                 preferredRotation = mLidOpenRotation;
@@ -9186,5 +9218,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (!cameraId.equals(mRearFlashCameraId)) return;
             mTorchEnabled = false;
         }
+    }
+
+    public void freezeOrThawRotation(int rotation) {
+        mDesiredRotation = rotation;
+    }
+
+    private void toggleSingleHand(Context context, boolean isLeft) {
+        Settings.Global.putString(context.getContentResolver(), Settings.Global.SINGLE_HAND_MODE,
+                Settings.Global.getString(context.getContentResolver(),
+                    Settings.Global.SINGLE_HAND_MODE).isEmpty() ?
+                    isLeft ? "left" : "right" : "");
     }
 }
